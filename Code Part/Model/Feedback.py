@@ -1,3 +1,11 @@
+"""" A feedback given by a customer after each ride
+- id: unique id
+- rate: 1-5 (the rating)
+- date: the date of the feedback
+- message: customer message
+"""
+
+
 class Feedback:
     def __init__(self):
         self.__id = None

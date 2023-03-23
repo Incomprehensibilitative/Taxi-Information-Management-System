@@ -1,3 +1,11 @@
+"""" A generic vehicle for transportation
+- id: unique id
+- type: 5S, 7S, 9S (the number of seats including the driver)
+- regis_num : '(29)[A-Z] [0-999].[0-99]'
+- price: how much a vehicle charge per km
+"""
+
+
 class Vehicle:
     def __init__(self):
         self.__id = None

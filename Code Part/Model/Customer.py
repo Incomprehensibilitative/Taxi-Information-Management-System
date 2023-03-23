@@ -1,3 +1,10 @@
+"""" A generic customer 
+- id: unique id
+- name: customer name
+- phone_num: customer phone number
+"""
+
+
 class Customer:
     def __init__(self):
         self.__id = None

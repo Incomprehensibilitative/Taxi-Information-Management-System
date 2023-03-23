@@ -1,3 +1,10 @@
+""""A generic Driver
+- id: unique id
+- name, gender, age, phone, salary: belong to the driver
+- vehicle_id: each driver is assigned with a specific vehicle
+"""
+
+
 class Driver:
     def __init__(self):
         self.__id = None
