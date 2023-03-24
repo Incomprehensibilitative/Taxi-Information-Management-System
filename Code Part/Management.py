@@ -1,3 +1,6 @@
+from Model import *
+import input
+
 class Management:
     def __init__(self):
         # To keep track of the number of object
@@ -11,15 +14,20 @@ class Management:
         self.__invoice_list = []
         self.__vehicle_list = []
 
+    """ Access database"""
+    def
+
     """ Adding new object function """
     def new_driver(self):
+        # take in
         pass
 
     def new_vehicle(self):
         pass
 
     def new_customer(self):
-        pass
+        id, name, phone_num = input.take_customer_info()
+        new_cus = 
 
     def new_feedback(self):
         pass

@@ -9,12 +9,14 @@
 class Feedback:
     def __init__(self):
         self.__id = None
+        self.__customer_id = None
         self.__rate = None
         self.__date = None
         self.__message = None
 
-    def set_feedback(self, id, rate, date, message):
+    def set_feedback(self, id, customer_id, rate, date, message):
         self.__id = id
+        self.__customer_id = customer_id
         self.__rate = rate
         self.__date = date
         self.__message = message
