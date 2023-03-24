@@ -15,7 +15,6 @@ class Management:
         self.__vehicle_list = []
 
     """ Access database"""
-    def
 
     """ Adding new object function """
     def new_driver(self):
@@ -26,8 +25,7 @@ class Management:
         pass
 
     def new_customer(self):
-        id, name, phone_num = input.take_customer_info()
-        new_cus = 
+        pass
 
     def new_feedback(self):
         pass

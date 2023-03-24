@@ -1,14 +1,7 @@
 from Model import Customer, Vehicle, Driver, Invoice, Feedback
-
 import openpyxl
 
-""" Access database """
-"""" Take user input """
-# user input
-"""1. tkinter take user input
-    2. regular expression check input
-    3. write to database excel"""
-# database input
+# read database
 data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only=True)
 
 
