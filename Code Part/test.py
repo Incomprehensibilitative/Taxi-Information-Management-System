@@ -10,7 +10,7 @@ data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only
 #     new_customer.set_customer(row[0].value, row[1].value, row[2].value)
 #     customer_list.append(new_customer)
 # for element in customer_list:
-#     print("{:8} {:<15} {:<10}".format(element.get_id(), element.get_name(), element.get_phone_num()))
+#     print("{:8} {:<15} {:<15}".format(element.get_id(), element.get_name(), element.get_phone_num()))
 
 # sheet = data['Vehicle']
 # vehicle_list = []
