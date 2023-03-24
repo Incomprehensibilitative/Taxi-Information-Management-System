@@ -1,6 +1,4 @@
-def main():
-    pass
-
+import Management
 
 if __name__ == "__main__":
-    main()
+    database = Management.Management()

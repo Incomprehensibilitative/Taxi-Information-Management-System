@@ -9,7 +9,7 @@ class Driver:
     def __init__(self):
         self.__id = None
         self.__name = None
-        self.__phone = None
+        self.__phone_num = None
         self.__vehicle_id = None
         self.__salary = None
         self.__gender = None
@@ -18,7 +18,7 @@ class Driver:
     def set_driver(self, id, name, phone, vehicle_id, salary, gender, age):
         self.__id = id
         self.__name = name
-        self.__phone = phone
+        self.__phone_num = phone
         self.__vehicle_id = vehicle_id
         self.__salary = salary
         self.__gender = gender
@@ -31,7 +31,7 @@ class Driver:
         return self.__name
 
     def get_phone(self):
-        return self.__phone
+        return self.__phone_num
 
     def get_vehicle_id(self):
         return self.__vehicle_id
