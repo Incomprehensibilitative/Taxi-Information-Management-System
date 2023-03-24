@@ -1,28 +1,22 @@
 import openpyxl
-from Model import Customer
+from Model import Customer, Vehicle, Driver, Feedback, Invoice
 
-data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True)
-sheet1 = data['Customer']
-# print(sheet1.max_row)
-# print(sheet1.max_column)
+data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only=True)
 
-# for i in range(1, sheet1.max_row+1):
-#     for cell in sheet1[i]:
-#         print(cell.value)
+# sheet = data['Customer']
+# customer_list = []
+# for row in sheet:
+#     new_customer = Customer.Customer()
+#     new_customer.set_customer(row[0].value, row[1].value, row[2].value)
+#     customer_list.append(new_customer)
+# for element in customer_list:
+#     print("{:8} {:<15} {:<10}".format(element.get_id(), element.get_name(), element.get_phone_num()))
 
-# l1 = sheet1.iter_rows(min_row=1, max_row=2, values_only=True)
-# r_set = sheet1.iter_rows(min_row=2, max_row=sheet1.max_row, values_only=True)
-# l1 = [r for r in l1]
-# r_set = [r for r in r_set]
-# data.close()
-# print(l1[0])
-# print(r_set)
-
-customer_list = []
-for row in sheet1:
-    new_customer = Customer.Customer()
-    new_customer.set_customer(row[0].value, row[1].value, row[2].value)
-    customer_list.append(new_customer)
-
-for element in customer_list:
-    print("{:8} {:<15} {:<10}".format(element.get_id(), element.get_name(), element.get_phone_num()))
+# sheet = data['Vehicle']
+# vehicle_list = []
+# for row in sheet:
+#     new_vehicle = Vehicle.Vehicle()
+#     new_vehicle.set_vehicle(row[0].value, row[1].value, row[2].value, row[3].value)
+#     vehicle_list.append(new_vehicle)
+# for element in vehicle_list:
+#     print("{:8} {:5} {:15} {}".format(element.get_id(), element.get_type(), element.get_regis(), element.get_price()))
