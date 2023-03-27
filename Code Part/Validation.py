@@ -73,7 +73,7 @@ def is_valid_driver_id(driver_id):
 
 
 def is_valid_vehicle_id(vehicle_id):
-    pattern = r"^V\d+$"
+    pattern = r"[579]S\d{3}"
     return bool(re.match(pattern, vehicle_id))
 
 
