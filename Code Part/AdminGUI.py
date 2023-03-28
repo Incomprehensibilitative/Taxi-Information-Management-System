@@ -39,8 +39,6 @@ path = "Taxi-information.xlsx"
 workbook = openpyxl.load_workbook(path, data_only=True)
 
 """ New administration windows """
-
-
 # Invoice window
 # def invoice():
 #     def load_data():
@@ -192,15 +190,42 @@ def vehicle():
             treeview.insert('', tk.END, values=value_tuple)
 
     def enter_vehicle_data():
-        id = id_entry.get()
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
         price = price_combobox.get()
-        if not validation.is_valid_vehicle_id(id) or id == "Enter id":
+        if not Validation.is_valid_vehicle_id(id) or id == "Enter id":
             tkinter.messagebox.showwarning(title="Error", message="Invalid id")
-        if not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
+        if not Validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
         # Add new vehicle to database
+        else:
+            path = "Test-Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+
+            vehicle_sheet = workbook['Vehicle']
+            vehicle_id = f"{type}{random.randint(0,999)}"
+            vehicle_list = dr.take_vehicle_info()
+            vehicle_id_list = []
+            price = 0
+            for vehicle in vehicle_list:
+                vehicle_id_list.append(vehicle.get_id())
+            while vehicle_id in vehicle_id_list:
+                vehicle_id = f"{type}{random.randint(0, 999)}"
+            if type == "5S":
+                price = "10,000"
+            if type == "7S":
+                price = "13,000"
+            if type == "9S":
+                price = "15,000"
+
+            row_values = [vehicle_id, type, regis_num, price]
+            vehicle_sheet.append(row_values)
+            workbook.save(path)
+
+            treeview.insert('', tk.END, values=row_values)
+            type_combobox.set(type_list[0])
+            regis_num_entry.delete(0, "end")
+
 
     vehicle_window = tk.Tk()
     vehicle_window.title("New vehicle")
@@ -210,42 +235,31 @@ def vehicle():
     vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Vehicle info")
     vehicle_info_frame.grid(row=0, column=0, padx=20, pady=10)
 
-    # id
-    id_label = tk.Label(vehicle_info_frame, text="ID")
-    id_label.grid(row=0, column=0)
-    id_entry = tk.Entry(vehicle_info_frame)
-    id_entry.insert(0, "Enter ID")
-    id_entry.configure(state='disabled')
-    id_entry.grid(row=1, column=0)
-
     # type
+    type_list = ["5S", "7S", "9S"]
     type_label = tk.Label(vehicle_info_frame, text="Type")
     type_label.grid(row=0, column=1)
-    type_combobox = ttk.Combobox(vehicle_info_frame, values=["5S", "7S", "9S"])
+    type_combobox = ttk.Combobox(vehicle_info_frame, values=type_list)
     type_combobox.grid(row=1, column=1)
 
     # regis number
     regis_num_label = tk.Label(vehicle_info_frame, text="Regis number")
-    regis_num_label.grid(row=2, column=0)
+    regis_num_label.grid(row=0, column=0)
     regis_num_entry = tk.Entry(vehicle_info_frame)
-    regis_num_entry.insert(0, "Enter Regis Num")
+    regis_num_entry.insert(0, "29–C1 233.23")
     regis_num_entry.configure(state='disabled')
-    regis_num_entry.grid(row=3, column=0)
+    regis_num_entry.grid(row=1, column=0)
 
     # price
     price_label = tk.Label(vehicle_info_frame, text="Price")
-    price_label.grid(row=2, column=1)
-    price_combobox = ttk.Combobox(vehicle_info_frame, values=["10.000", "13.000", "15.000"])
-    price_combobox.grid(row=3, column=1)
-
+    price_label.grid(row=0, column=3)
+    price_info_label = tk.Label(vehicle_info_frame, text="5S - 10,000\n7S - 13,000\n9S - 15,000")
+    price_info_label.grid(row=1, column=3)
     # Confirm button
     button = tk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data)
-    button.grid(row=4, column=0, sticky="news", padx=20, pady=10)
+    button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Disable placeholder
-    id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
-    id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'Enter name'))
-
     regis_num_entry.bind('<Button-1>', lambda x: on_focus_in(regis_num_entry))
     regis_num_entry.bind('<FocusOut>', lambda x: on_focus_out(regis_num_entry, 'Enter regis number'))
 
@@ -306,6 +320,9 @@ def driver():
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
         else:
+            path = "Test-Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+
             # The driver id need to be created by the system to make sure it's unique
             driver_sheet = workbook['Driver']
             driver_id = f"D{random.randint(0, 999)}"
@@ -424,7 +441,8 @@ vehicle_button = tk.Button(frame, text="Vehicle Administration", command=vehicle
 vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
 # Invoice
-# invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
-# invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
+invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+
 
 window.mainloop()
