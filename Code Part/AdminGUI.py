@@ -5,10 +5,7 @@ import validation
 import openpyxl
 import database_reader as dr
 import random
-
 """ Common functions """
-
-
 # check existence
 def exist_vehicle_id(id):
     driver_list = dr.take_driver_info()
@@ -38,143 +35,242 @@ def on_focus_out(entry, placeholder):
 path = "Taxi-information.xlsx"
 workbook = openpyxl.load_workbook(path, data_only=True)
 
+
 """ New administration windows """
+# Customer window
+def customer():
+    def load_data():
+        sheet = workbook['Customer']
+        list_values = list(sheet.values)
+        print(list_values)
+        for col_name in list_values[0]:
+            treeview.heading(col_name, text=col_name)
+
+        for value_tuple in list_values[1:]:
+            treeview.insert('', tk.END, values=value_tuple)
+
+    def enter_customer_data():
+        name = name_entry.get()
+        phone_num = phone_num_entry.get()
+
+        if not validation.is_valid_name(name) or name == "Enter name":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+        elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+        else:
+            path = "Test-Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+            customer_sheet = workbook['Customer']
+            customer_id = f"D{random.randint(0, 999)}"
+            customer_list = dr.take_customer_info()
+            customer_id_list = []
+            for customer in customer_list:
+                customer_id_list.append(customer.get_id())
+            while customer_id in customer_id_list:
+                customer_id = f"C{random.randint(0, 999)}"
+
+            row_values = [customer_id, name, phone_num]
+
+            customer_sheet.append(row_values)
+            workbook.save(path)
+            treeview.insert('', tk.END, value=row_values)
+            name_entry.delete(0, "end")
+            phone_num_entry.delete(0, "end")
+
+    # Saving User Info
+
+    customer_window = tk.Tk()
+    customer_window.title("Customer Admin")
+    customer_frame = ttk.Frame(customer_window)
+    customer_frame.pack()
+
+    user_info_frame = tk.LabelFrame(customer_frame, text="Customer")
+    user_info_frame.grid(row=0, column=0, padx=20, pady=10)
+
+    # name
+    name_label = tk.Label(user_info_frame, text="Name")
+    name_label.grid(row=0, column=0)
+    name_entry = tk.Entry(user_info_frame)
+    name_entry.insert(0, "Enter name")
+    name_entry.configure(state='disabled')
+    name_entry.grid(row=1, column=0)
+
+    # phone number
+    phone_num_label = tk.Label(user_info_frame, text="Phone Number")
+    phone_num_label.grid(row=0, column=1)
+    phone_num_entry = tk.Entry(user_info_frame)
+    phone_num_entry.insert(0, "0### ### ###")
+    phone_num_entry.configure(state='disabled')
+    phone_num_entry.grid(row=1, column=1)
+
+    # Button
+    button = tk.Button(user_info_frame, text="Enter data", command=enter_customer_data)
+    button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+
+    for widget in user_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+
+    # disable placeholder
+    name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
+    name_entry.bind(
+        '<FocusOut>', lambda x: on_focus_out(name_entry, 'Enter name'))
+
+    phone_num_entry.bind('<Button-1>', lambda x: on_focus_in(phone_num_entry))
+    phone_num_entry.bind('<FocusOut>', lambda x: on_focus_out(phone_num_entry, '0### ### ###'))
+
+    treeFrame = ttk.Frame(customer_frame)
+    treeFrame.grid(row=0, column=1, pady=10)
+    treeScroll = ttk.Scrollbar(treeFrame)
+    treeScroll.pack(side="right", fill="y")
+    cols = ("id", "name", "phone_num")
+    treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
+    treeview.column("id", width=50)
+    treeview.column("name", width=100)
+    treeview.column("phone_num", width=100)
+    treeview.pack()
+    treeScroll.config(command=treeview.yview())
+    load_data()
+    customer_window.mainloop()
+
+
 # Invoice window
-# def invoice():
-#     def load_data():
-#         sheet = workbook['Invoice']
-#         list_values = list(sheet.values)
-#         print(list_values)
-#         for col_name in list_values[0]:
-#             treeview.heading(col_name, text=col_name)
-#
-#         for value_tuple in list_values[1:]:
-#             treeview.insert('', tk.END, values=value_tuple)
-#
-#     def enter_invoice_data():
-#         id = id_entry.get()
-#         customer_id = customer_id_entry.get()
-#         driver_id = driver_id_entry.get()
-#         date = date_entry.get()
-#         payment = payment_combobox.get()
-#         distance = distance_entry.get()
-#         price = price_combobox.get()
-#         if not validation.is_valid_invoice_id(id) or id == "Enter ID":
-#             tkinter.messagebox.showwarning(title="Error", message="Invalid ID")
-#         if not validation.is_valid_customer_id(customer_id) or customer_id == "Enter customer ID":
-#             tkinter.messagebox.showwarning(title="Error", message="Invalid customer ID")
-#         if not validation.is_valid_driver_id(driver_id) or driver_id == "Enter driver ID":
-#             tkinter.messagebox.showwarning(title="Error", message="Invalid driver ID")
-#         if not validation.is_valid_date(date) or date == "Enter date":
-#             tkinter.messagebox.showwarning(title="Error", message="Invalid date")
-#         if not validation.is_valid_distance(distance) or distance == "Enter distance":
-#             tkinter.messagebox.showwarning(title="Error", message="Invalid distance")
-#         # time to add new invoice to the database
-#
-#     invoice_window = tk.Tk()
-#     invoice_window.title("New invoice")
-#     invoice_frame = tk.Frame(invoice_window)
-#     invoice_frame.pack()
-#
-#     invoice_info_frame = tk.LabelFrame(invoice_frame, text="Invoice info")
-#     invoice_info_frame.grid(row=0, column=0, padx=20, pady=10)
-#
-#     # id
-#     id_label = tk.Label(invoice_info_frame, text="ID")
-#     id_label.grid(row=0, column=0)
-#     id_entry = tk.Entry(invoice_info_frame)
-#     id_entry.insert(0, "Enter ID")
-#     id_entry.configure(state='disabled')
-#     id_entry.grid(row=1, column=0)
-#
-#     # customer_id
-#     customer_id_label = tk.Label(invoice_info_frame, text="Customer ID")
-#     customer_id_label.grid(row=0, column=1)
-#     customer_id_entry = tk.Entry(invoice_info_frame)
-#     customer_id_entry.insert(0, "Enter Customer ID")
-#     customer_id_entry.configure(state='disabled')
-#     customer_id_entry.grid(row=1, column=1)
-#
-#     # driver_id
-#     driver_id_label = tk.Label(invoice_info_frame, text="Driver ID")
-#     driver_id_label.grid(row=0, column=2)
-#     driver_id_entry = tk.Entry(invoice_info_frame)
-#     driver_id_entry.insert(0, "Enter Driver ID")
-#     driver_id_entry.configure(state='disabled')
-#     driver_id_entry.grid(row=1, column=2)
-#
-#     # date
-#     date_label = tk.Label(invoice_info_frame, text="Date")
-#     date_label.grid(row=2, column=0)
-#     date_entry = tk.Entry(invoice_info_frame)
-#     date_entry.insert(0, "Enter Date")
-#     date_entry.configure(state='disabled')
-#     date_entry.grid(row=3, column=0)
-#
-#     # Way to payment
-#     payment_label = tk.Label(invoice_info_frame, text="Payment")
-#     payment_label.grid(row=2, column=1)
-#     payment_combobox = ttk.Combobox(invoice_info_frame, values=["Cash", "Banking"])
-#     payment_combobox.grid(row=3, column=1)
-#
-#     # Distance
-#     distance_label = tk.Label(invoice_info_frame, text="Distance")
-#     distance_label.grid(row=4, column=0)
-#     distance_entry = tk.Entry(invoice_info_frame)
-#     distance_entry.insert(0, "Enter distance")
-#     distance_entry.configure(state='disabled')
-#     distance_entry.grid(row=5, column=0)
-#
-#     # Price per km
-#     price_label = tk.Label(invoice_info_frame, text="Price")
-#     price_label.grid(row=4, column=1)
-#     price_combobox = ttk.Combobox(invoice_info_frame, values=["10.000", "13.000", "15.000"])
-#     price_combobox.grid(row=5, column=1)
-#
-#     # Confirm button
-#     button = tk.Button(invoice_info_frame, text="Enter data", command=enter_invoice_data)
-#     button.grid(row=6, column=0, sticky="news", padx=20, pady=10)
-#
-#     # Disable placeholder
-#     id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
-#     id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'Enter ID'))
-#
-#     customer_id_entry.bind('<Button-1>', lambda x: on_focus_in(customer_id_entry))
-#     customer_id_entry.bind('<FocusOut>', lambda x: on_focus_out(customer_id_entry, 'Enter Customer ID'))
-#
-#     driver_id_entry.bind('<Button-1>', lambda x: on_focus_in(driver_id_entry))
-#     driver_id_entry.bind('<FocusOut>', lambda x: on_focus_out(driver_id_entry, 'Enter Driver ID'))
-#
-#     date_entry.bind('<Button-1>', lambda x: on_focus_in(date_entry))
-#     date_entry.bind('<FocusOut>', lambda x: on_focus_out(date_entry, 'Enter Date'))
-#
-#     distance_entry.bind('<Button-1>', lambda x: on_focus_in(distance_entry))
-#     distance_entry.bind('<FocusOut>', lambda x: on_focus_out(distance_entry, 'Enter Distance'))
-#
-#     for widget in invoice_info_frame.winfo_children():
-#         widget.grid_configure(padx=10, pady=5)
-#
-#     treeFrame = ttk.Frame(invoice_frame)
-#     treeFrame.grid(row=0, column=1, pady=10)
-#     treeScroll = ttk.Scrollbar(treeFrame)
-#     treeScroll.pack(side="right", fill="y")
-#
-#     cols = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
-#     treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
-#     treeview.column("id", width=50)
-#     treeview.column("customer_id", width=50)
-#     treeview.column("driver_id", width=50)
-#     treeview.column("date", width=67)
-#     treeview.column("payment_mode", width=70)
-#     treeview.column("distance", width=80)
-#     treeview.column("price_per_km", width=100)
-#     treeview.column("total_fee", width=70)
-#
-#     treeview.pack()
-#     treeScroll.config(command=treeview.yview())
-#     load_data()
-#
-#     invoice_window.mainloop()
+def invoice():
+    def load_data():
+        sheet = workbook['Invoice']
+        list_values = list(sheet.values)
+        print(list_values)
+        for col_name in list_values[0]:
+            treeview.heading(col_name, text=col_name)
+
+        for value_tuple in list_values[1:]:
+            treeview.insert('', tk.END, values=value_tuple)
+
+
+    def enter_invoice_data():
+        id = id_entry.get()
+        customer_id = customer_id_entry.get()
+        driver_id = driver_id_entry.get()
+        date = date_entry.get()
+        payment = payment_combobox.get()
+        distance = distance_entry.get()
+        price = price_combobox.get()
+        if not validation.is_valid_invoice_id(id) or id == "Enter ID":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid ID")
+        elif not validation.is_valid_customer_id(customer_id) or customer_id == "Enter customer ID":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid customer ID")
+        elif not validation.is_valid_driver_id(driver_id) or driver_id == "Enter driver ID":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid driver ID")
+        elif not validation.is_valid_date(date) or date == "Enter date":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid date")
+        elif not validation.is_valid_distance(distance) or distance == "Enter distance":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid distance")
+        # time to add new invoice to the database
+
+    invoice_window = tk.Tk()
+    invoice_window.title("New invoice")
+    invoice_frame = tk.Frame(invoice_window)
+    invoice_frame.pack()
+
+    invoice_info_frame = tk.LabelFrame(invoice_frame, text="Invoice info")
+    invoice_info_frame.grid(row=0, column=0, padx=20, pady=10)
+
+    # id
+    id_label = tk.Label(invoice_info_frame, text="ID")
+    id_label.grid(row=0, column=0)
+    id_entry = tk.Entry(invoice_info_frame)
+    id_entry.insert(0, "Enter ID")
+    id_entry.configure(state='disabled')
+    id_entry.grid(row=1, column=0)
+
+    # customer_id
+    customer_id_label = tk.Label(invoice_info_frame, text="Customer ID")
+    customer_id_label.grid(row=0, column=1)
+    customer_id_entry = tk.Entry(invoice_info_frame)
+    customer_id_entry.insert(0, "Enter Customer ID")
+    customer_id_entry.configure(state='disabled')
+    customer_id_entry.grid(row=1, column=1)
+
+    # driver_id
+    driver_id_label = tk.Label(invoice_info_frame, text="Driver ID")
+    driver_id_label.grid(row=0, column=2)
+    driver_id_entry = tk.Entry(invoice_info_frame)
+    driver_id_entry.insert(0, "Enter Driver ID")
+    driver_id_entry.configure(state='disabled')
+    driver_id_entry.grid(row=1, column=2)
+
+    # date
+    date_label = tk.Label(invoice_info_frame, text="Date")
+    date_label.grid(row=2, column=0)
+    date_entry = tk.Entry(invoice_info_frame)
+    date_entry.insert(0, "Enter Date")
+    date_entry.configure(state='disabled')
+    date_entry.grid(row=3, column=0)
+
+    # Way to payment
+    payment_label = tk.Label(invoice_info_frame, text="Payment")
+    payment_label.grid(row=2, column=1)
+    payment_combobox = ttk.Combobox(invoice_info_frame, values=["Cash", "Banking"])
+    payment_combobox.grid(row=3, column=1)
+
+    # Distance
+    distance_label = tk.Label(invoice_info_frame, text="Distance")
+    distance_label.grid(row=4, column=0)
+    distance_entry = tk.Entry(invoice_info_frame)
+    distance_entry.insert(0, "Enter distance")
+    distance_entry.configure(state='disabled')
+    distance_entry.grid(row=5, column=0)
+
+    # Price per km
+    price_label = tk.Label(invoice_info_frame, text="Price")
+    price_label.grid(row=4, column=1)
+    price_combobox = ttk.Combobox(invoice_info_frame, values=["10.000", "13.000", "15.000"])
+    price_combobox.grid(row=5, column=1)
+
+    # Confirm button
+    button = tk.Button(invoice_info_frame, text="Enter data", command=enter_invoice_data)
+    button.grid(row=6, column=0, sticky="news", padx=20, pady=10)
+
+    # Disable placeholder
+    id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
+    id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'Enter ID'))
+
+    customer_id_entry.bind('<Button-1>', lambda x: on_focus_in(customer_id_entry))
+    customer_id_entry.bind('<FocusOut>', lambda x: on_focus_out(customer_id_entry, 'Enter Customer ID'))
+
+    driver_id_entry.bind('<Button-1>', lambda x: on_focus_in(driver_id_entry))
+    driver_id_entry.bind('<FocusOut>', lambda x: on_focus_out(driver_id_entry, 'Enter Driver ID'))
+
+    date_entry.bind('<Button-1>', lambda x: on_focus_in(date_entry))
+    date_entry.bind('<FocusOut>', lambda x: on_focus_out(date_entry, 'Enter Date'))
+
+    distance_entry.bind('<Button-1>', lambda x: on_focus_in(distance_entry))
+    distance_entry.bind('<FocusOut>', lambda x: on_focus_out(distance_entry, 'Enter Distance'))
+
+    for widget in invoice_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+
+    treeFrame = ttk.Frame(invoice_frame)
+    treeFrame.grid(row=0, column=1, pady=10)
+    treeScroll = ttk.Scrollbar(treeFrame)
+    treeScroll.pack(side="right", fill="y")
+
+    cols = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
+    treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
+    treeview.column("id", width=50)
+    treeview.column("customer_id", width=50)
+    treeview.column("driver_id", width=50)
+    treeview.column("date", width=67)
+    treeview.column("payment_mode", width=70)
+    treeview.column("distance", width=80)
+    treeview.column("price_per_km", width=100)
+    treeview.column("total_fee", width=70)
+
+    treeview.pack()
+    treeScroll.config(command=treeview.yview())
+    load_data()
+
+
+    invoice_window.mainloop()
 
 
 # Vehicle window
@@ -192,10 +288,11 @@ def vehicle():
     def enter_vehicle_data():
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
-        price = price_combobox.get()
-        if not Validation.is_valid_vehicle_id(id) or id == "Enter id":
+        if not validation.is_valid_vehicle_id(id) or id == "Enter id":
             tkinter.messagebox.showwarning(title="Error", message="Invalid id")
-        if not Validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
+        elif not validation.is_valid_vehicle_type(type):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
+        elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
         # Add new vehicle to database
         else:
@@ -345,6 +442,8 @@ def driver():
             gender_combobox.set(gender_combo_list[0])
             age_spinbox.delete(0, "end")
 
+
+
     # main frame for Driver Admin
     driver_window = tk.Tk()
     driver_window.title("Driver Admin")
@@ -444,5 +543,7 @@ vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
 invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
-
+# Customer
+customer_button = tk.Button(frame, text="Customer Administration", command=customer)
+customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 window.mainloop()
