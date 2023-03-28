@@ -1,4 +1,4 @@
-from Model import Customer, Vehicle, Driver, Invoice, Feedback
+from Domains import Customer, Vehicle, Driver, Invoice, Feedback
 import openpyxl
 
 # read database
