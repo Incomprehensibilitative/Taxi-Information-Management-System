@@ -17,6 +17,7 @@ def exist_vehicle_id(id):
         return 1
     return 0
 
+
 # Placeholder Function
 def on_focus_in(entry):
     if entry.cget('state') == 'disabled':
@@ -36,6 +37,102 @@ workbook = openpyxl.load_workbook(path, data_only=True)
 
 
 """ New administration windows """
+# Customer window
+def customer():
+    def load_data():
+        sheet = workbook['Customer']
+        list_values = list(sheet.values)
+        print(list_values)
+        for col_name in list_values[0]:
+            treeview.heading(col_name, text=col_name)
+
+        for value_tuple in list_values[1:]:
+            treeview.insert('', tk.END, values=value_tuple)
+
+    def enter_customer_data():
+        name = name_entry.get()
+        phone_num = phone_num_entry.get()
+
+        if not Validation.is_valid_name(name) or name == "Enter name":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+        if not Validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+        else:
+            path = "Test-Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+            customer_sheet = workbook['Customer']
+            customer_id = f"D{random.randint(0, 999)}"
+            customer_list = dr.take_customer_info()
+            customer_id_list = []
+            for customer in customer_list:
+                customer_id_list.append(customer.get_id())
+            while customer_id in customer_id_list:
+                customer_id = f"C{random.randint(0, 999)}"
+
+            row_values = [customer_id, name, phone_num]
+
+            customer_sheet.append(row_values)
+            workbook.save(path)
+            treeview.insert('', tk.END, value=row_values)
+            name_entry.delete(0, "end")
+            phone_num_entry.delete(0, "end")
+
+    # Saving User Info
+
+    customer_window = tk.Tk()
+    customer_window.title("Customer Admin")
+    customer_frame = ttk.Frame(customer_window)
+    customer_frame.pack()
+
+    user_info_frame = tk.LabelFrame(customer_frame, text="Customer")
+    user_info_frame.grid(row=0, column=0, padx=20, pady=10)
+
+    # name
+    name_label = tk.Label(user_info_frame, text="Name")
+    name_label.grid(row=0, column=0)
+    name_entry = tk.Entry(user_info_frame)
+    name_entry.insert(0, "Enter name")
+    name_entry.configure(state='disabled')
+    name_entry.grid(row=1, column=0)
+
+    # phone number
+    phone_num_label = tk.Label(user_info_frame, text="Phone Number")
+    phone_num_label.grid(row=0, column=1)
+    phone_num_entry = tk.Entry(user_info_frame)
+    phone_num_entry.insert(0, "0### ### ###")
+    phone_num_entry.configure(state='disabled')
+    phone_num_entry.grid(row=1, column=1)
+
+    # Button
+    button = tk.Button(user_info_frame, text="Enter data", command=enter_customer_data)
+    button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+
+    for widget in user_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+
+    # disable placeholder
+    name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
+    name_entry.bind(
+        '<FocusOut>', lambda x: on_focus_out(name_entry, 'Enter name'))
+
+    phone_num_entry.bind('<Button-1>', lambda x: on_focus_in(phone_num_entry))
+    phone_num_entry.bind('<FocusOut>', lambda x: on_focus_out(phone_num_entry, '0### ### ###'))
+
+    treeFrame = ttk.Frame(customer_frame)
+    treeFrame.grid(row=0, column=1, pady=10)
+    treeScroll = ttk.Scrollbar(treeFrame)
+    treeScroll.pack(side="right", fill="y")
+    cols = ("id", "name", "phone_num")
+    treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
+    treeview.column("id", width=50)
+    treeview.column("name", width=100)
+    treeview.column("phone_num", width=100)
+    treeview.pack()
+    treeScroll.config(command=treeview.yview())
+    load_data()
+    customer_window.mainloop()
+
+
 # Invoice window
 def invoice():
     def load_data():
@@ -189,15 +286,43 @@ def vehicle():
             treeview.insert('', tk.END, values=value_tuple)
 
     def enter_vehicle_data():
-        id = id_entry.get()
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
-        price = price_combobox.get()
         if not Validation.is_valid_vehicle_id(id) or id == "Enter id":
             tkinter.messagebox.showwarning(title="Error", message="Invalid id")
+        if not Validation.is_valid_vehicle_type(type):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
         if not Validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
         # Add new vehicle to database
+        else:
+            path = "Test-Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+
+            vehicle_sheet = workbook['Vehicle']
+            vehicle_id = f"{type}{random.randint(0,999)}"
+            vehicle_list = dr.take_vehicle_info()
+            vehicle_id_list = []
+            price = 0
+            for vehicle in vehicle_list:
+                vehicle_id_list.append(vehicle.get_id())
+            while vehicle_id in vehicle_id_list:
+                vehicle_id = f"{type}{random.randint(0, 999)}"
+            if type == "5S":
+                price = "10,000"
+            if type == "7S":
+                price = "13,000"
+            if type == "9S":
+                price = "15,000"
+
+            row_values = [vehicle_id, type, regis_num, price]
+            vehicle_sheet.append(row_values)
+            workbook.save(path)
+
+            treeview.insert('', tk.END, values=row_values)
+            type_combobox.set(type_list[0])
+            regis_num_entry.delete(0, "end")
+
 
     vehicle_window = tk.Tk()
     vehicle_window.title("New vehicle")
@@ -207,42 +332,31 @@ def vehicle():
     vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Vehicle info")
     vehicle_info_frame.grid(row=0, column=0, padx=20, pady=10)
 
-    # id
-    id_label = tk.Label(vehicle_info_frame, text="ID")
-    id_label.grid(row=0, column=0)
-    id_entry = tk.Entry(vehicle_info_frame)
-    id_entry.insert(0, "Enter ID")
-    id_entry.configure(state='disabled')
-    id_entry.grid(row=1, column=0)
-
     # type
+    type_list = ["5S", "7S", "9S"]
     type_label = tk.Label(vehicle_info_frame, text="Type")
     type_label.grid(row=0, column=1)
-    type_combobox = ttk.Combobox(vehicle_info_frame, values=["5S", "7S", "9S"])
+    type_combobox = ttk.Combobox(vehicle_info_frame, values=type_list)
     type_combobox.grid(row=1, column=1)
 
     # regis number
     regis_num_label = tk.Label(vehicle_info_frame, text="Regis number")
-    regis_num_label.grid(row=2, column=0)
+    regis_num_label.grid(row=0, column=0)
     regis_num_entry = tk.Entry(vehicle_info_frame)
-    regis_num_entry.insert(0, "Enter Regis Num")
+    regis_num_entry.insert(0, "29–C1 233.23")
     regis_num_entry.configure(state='disabled')
-    regis_num_entry.grid(row=3, column=0)
+    regis_num_entry.grid(row=1, column=0)
 
     # price
     price_label = tk.Label(vehicle_info_frame, text="Price")
-    price_label.grid(row=2, column=1)
-    price_combobox = ttk.Combobox(vehicle_info_frame, values=["10.000", "13.000", "15.000"])
-    price_combobox.grid(row=3, column=1)
-
+    price_label.grid(row=0, column=3)
+    price_info_label = tk.Label(vehicle_info_frame, text="5S - 10,000\n7S - 13,000\n9S - 15,000")
+    price_info_label.grid(row=1, column=3)
     # Confirm button
     button = tk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data)
-    button.grid(row=4, column=0, sticky="news", padx=20, pady=10)
+    button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Disable placeholder
-    id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
-    id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'Enter name'))
-
     regis_num_entry.bind('<Button-1>', lambda x: on_focus_in(regis_num_entry))
     regis_num_entry.bind('<FocusOut>', lambda x: on_focus_out(regis_num_entry, 'Enter regis number'))
 
@@ -303,6 +417,9 @@ def driver():
         if not Validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
         else:
+            path = "Test-Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+
             # The driver id need to be created by the system to make sure it's unique
             driver_sheet = workbook['Driver']
             driver_id = f"D{random.randint(0, 999)}"
@@ -426,5 +543,7 @@ vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
 invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
-
+# Customer
+customer_button = tk.Button(frame, text="Customer Administration", command=customer)
+customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 window.mainloop()
