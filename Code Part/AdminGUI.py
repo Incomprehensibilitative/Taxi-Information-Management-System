@@ -6,8 +6,17 @@ import openpyxl
 import database_reader as dr
 import random
 """ Common functions """
-# check existence
+def what_is_the_price(vehicle_id):
+    vehicle_type = vehicle_id[:2]
+    if vehicle_type == "5S":
+        return "10,000"
+    elif vehicle_type == "7S":
+        return "13,000"
+    elif vehicle_type == "9S":
+        return "15,000"
+    
 def exist_vehicle_id(id):
+# check existence
     driver_list = dr.take_driver_info()
     driver_vehicle_id_list = []
     # Check in driver whether the vehicle already belongs to other driver
@@ -32,7 +41,7 @@ def on_focus_out(entry, placeholder):
 
 
 # load data from database to print onto GUI
-path = "Taxi-information.xlsx"
+path = "Taxi-information (copy).xlsx"
 workbook = openpyxl.load_workbook(path, data_only=True)
 
 
@@ -132,13 +141,60 @@ def customer():
     load_data()
     customer_window.mainloop()
 
-
 # Invoice window
 def invoice():
+    def resolve_invoice():
+        customer_list = dr.take_customer_info()
+        invoice_list = dr.take_invoice_info()
+        driver_list = dr.take_driver_info()
+        invoice_list = dr.take_invoice_info()
+        
+        invoice_id_list = []
+        customer_id_list = []
+        invoice_customer_id_list = []
+        driver_id_list = []
+        payment_mode = ["cash", "banking"]
+        for invoice in invoice_list:
+            invoice_id_list.append(invoice.get_id())
+        for driver in driver_list:
+            driver_id_list.append(driver.get_id())
+        for customer in customer_list:
+            customer_id_list.append(customer.get_id())
+        for invoice in invoice_list:
+            invoice_customer_id_list.append(invoice.get_customer_id())
+        unassiged_customer = list(set(customer_id_list)- set(invoice_customer_id_list))
+        for customer_id in unassiged_customer:
+            invoice_id = f"I{random.randint(0, 999)}"
+            while invoice_id in invoice_id_list:
+                invoice_id = f"I{random.randint(0, 999)}"
+            driver_id = random.choice(driver_id_list)
+            vehicle_id = None
+            for driver in driver_list:
+                if driver.get_id() == driver_id:
+                    vehicle_id = driver.get_vehicle_id()
+            # need a date randomizer
+            date = None
+            payment = random.choice(payment_mode)
+            distance = random.randint(0, 100)
+            price_per_km = what_is_the_price(vehicle_id)
+            total_fee = distance*price_per_km
+            path = "Taxi-information.xlsx"
+            workbook = openpyxl.load_workbook(path, data_only=True)
+            invoice_sheet = workbook['Invoice']
+
+            row_values = [invoice_id, customer_id, driver_id, date, payment_mode, distance, price_per_km, total_fee]
+            invoice_sheet.append(row_values)
+            workbook.save(path)
+            treeview.insert('', tk.END, value=row_values)
+
+
+
+
+            
+
     def load_data():
         sheet = workbook['Invoice']
         list_values = list(sheet.values)
-        print(list_values)
         for col_name in list_values[0]:
             treeview.heading(col_name, text=col_name)
 
@@ -146,108 +202,11 @@ def invoice():
             treeview.insert('', tk.END, values=value_tuple)
 
 
-    def enter_invoice_data():
-        id = id_entry.get()
-        customer_id = customer_id_entry.get()
-        driver_id = driver_id_entry.get()
-        date = date_entry.get()
-        payment = payment_combobox.get()
-        distance = distance_entry.get()
-        price = price_combobox.get()
-        if not validation.is_valid_invoice_id(id) or id == "Enter ID":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid ID")
-        elif not validation.is_valid_customer_id(customer_id) or customer_id == "Enter customer ID":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid customer ID")
-        elif not validation.is_valid_driver_id(driver_id) or driver_id == "Enter driver ID":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid driver ID")
-        elif not validation.is_valid_date(date) or date == "Enter date":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid date")
-        elif not validation.is_valid_distance(distance) or distance == "Enter distance":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid distance")
-        # time to add new invoice to the database
-
     invoice_window = tk.Tk()
     invoice_window.title("New invoice")
     invoice_frame = tk.Frame(invoice_window)
     invoice_frame.pack()
 
-    invoice_info_frame = tk.LabelFrame(invoice_frame, text="Invoice info")
-    invoice_info_frame.grid(row=0, column=0, padx=20, pady=10)
-
-    # id
-    id_label = tk.Label(invoice_info_frame, text="ID")
-    id_label.grid(row=0, column=0)
-    id_entry = tk.Entry(invoice_info_frame)
-    id_entry.insert(0, "Enter ID")
-    id_entry.configure(state='disabled')
-    id_entry.grid(row=1, column=0)
-
-    # customer_id
-    customer_id_label = tk.Label(invoice_info_frame, text="Customer ID")
-    customer_id_label.grid(row=0, column=1)
-    customer_id_entry = tk.Entry(invoice_info_frame)
-    customer_id_entry.insert(0, "Enter Customer ID")
-    customer_id_entry.configure(state='disabled')
-    customer_id_entry.grid(row=1, column=1)
-
-    # driver_id
-    driver_id_label = tk.Label(invoice_info_frame, text="Driver ID")
-    driver_id_label.grid(row=0, column=2)
-    driver_id_entry = tk.Entry(invoice_info_frame)
-    driver_id_entry.insert(0, "Enter Driver ID")
-    driver_id_entry.configure(state='disabled')
-    driver_id_entry.grid(row=1, column=2)
-
-    # date
-    date_label = tk.Label(invoice_info_frame, text="Date")
-    date_label.grid(row=2, column=0)
-    date_entry = tk.Entry(invoice_info_frame)
-    date_entry.insert(0, "Enter Date")
-    date_entry.configure(state='disabled')
-    date_entry.grid(row=3, column=0)
-
-    # Way to payment
-    payment_label = tk.Label(invoice_info_frame, text="Payment")
-    payment_label.grid(row=2, column=1)
-    payment_combobox = ttk.Combobox(invoice_info_frame, values=["Cash", "Banking"])
-    payment_combobox.grid(row=3, column=1)
-
-    # Distance
-    distance_label = tk.Label(invoice_info_frame, text="Distance")
-    distance_label.grid(row=4, column=0)
-    distance_entry = tk.Entry(invoice_info_frame)
-    distance_entry.insert(0, "Enter distance")
-    distance_entry.configure(state='disabled')
-    distance_entry.grid(row=5, column=0)
-
-    # Price per km
-    price_label = tk.Label(invoice_info_frame, text="Price")
-    price_label.grid(row=4, column=1)
-    price_combobox = ttk.Combobox(invoice_info_frame, values=["10.000", "13.000", "15.000"])
-    price_combobox.grid(row=5, column=1)
-
-    # Confirm button
-    button = tk.Button(invoice_info_frame, text="Enter data", command=enter_invoice_data)
-    button.grid(row=6, column=0, sticky="news", padx=20, pady=10)
-
-    # Disable placeholder
-    id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
-    id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'Enter ID'))
-
-    customer_id_entry.bind('<Button-1>', lambda x: on_focus_in(customer_id_entry))
-    customer_id_entry.bind('<FocusOut>', lambda x: on_focus_out(customer_id_entry, 'Enter Customer ID'))
-
-    driver_id_entry.bind('<Button-1>', lambda x: on_focus_in(driver_id_entry))
-    driver_id_entry.bind('<FocusOut>', lambda x: on_focus_out(driver_id_entry, 'Enter Driver ID'))
-
-    date_entry.bind('<Button-1>', lambda x: on_focus_in(date_entry))
-    date_entry.bind('<FocusOut>', lambda x: on_focus_out(date_entry, 'Enter Date'))
-
-    distance_entry.bind('<Button-1>', lambda x: on_focus_in(distance_entry))
-    distance_entry.bind('<FocusOut>', lambda x: on_focus_out(distance_entry, 'Enter Distance'))
-
-    for widget in invoice_info_frame.winfo_children():
-        widget.grid_configure(padx=10, pady=5)
 
     treeFrame = ttk.Frame(invoice_frame)
     treeFrame.grid(row=0, column=1, pady=10)
@@ -267,6 +226,7 @@ def invoice():
 
     treeview.pack()
     treeScroll.config(command=treeview.yview())
+    resolve_invoice()
     load_data()
 
 
@@ -288,15 +248,13 @@ def vehicle():
     def enter_vehicle_data():
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
-        if not validation.is_valid_vehicle_id(id) or id == "Enter id":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid id")
-        elif not validation.is_valid_vehicle_type(type):
+        if not validation.is_valid_vehicle_type(type):
             tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
         # Add new vehicle to database
         else:
-            path = "Test-Taxi-information.xlsx"
+            path = "Taxi-information.xlsx"
             workbook = openpyxl.load_workbook(path, data_only=True)
 
             vehicle_sheet = workbook['Vehicle']
