@@ -1,11 +1,16 @@
 import openpyxl
-from Model import Customer, Vehicle, Driver, Feedback, Invoice
+import datetime
+import random
 
-data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only=True)
+from Domains import Customer, Vehicle, Driver, Invoice
+import database_reader as dr
+import database_destroyer as dd
+
+
 
 # sheet = data['Customer']
 # customer_list = []
-# for row in sheet:
+# for row in sheet.iter_rows(min_row = 2):
 #     new_customer = Customer.Customer()
 #     new_customer.set_customer(row[0].value, row[1].value, row[2].value)
 #     customer_list.append(new_customer)
@@ -30,3 +35,16 @@ data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only
 #     driver_list.append(new_driver)
 # for element in driver_list:
 #     print("{:3} {:7} {:12} {:8} {:10} {:7} {:3}".format(element.get_id(), element.get_name(), element.get_phone(), element.get_vehicle_id(), element.get_salary(), element.get_gender(), element.get_age()))
+
+# for i in range(10):
+#     print(dr.take_customer_info()[i].get_id())
+
+start_date = datetime.date(2022, 1, 1)
+end_date = datetime.datetime.now().date()
+
+time_between_dates = end_date - start_date
+days_between_dates = time_between_dates.days
+random_number_of_days = random.randrange(days_between_dates)
+random_date = start_date + datetime.timedelta(days=random_number_of_days)
+
+print(random_date)

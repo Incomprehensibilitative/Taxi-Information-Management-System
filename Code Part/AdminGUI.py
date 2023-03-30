@@ -1,10 +1,15 @@
+"""GUI:
+Using tkinter"""
+
 import tkinter as tk
 import tkinter.messagebox
 from tkinter import ttk
-import validation
 import openpyxl
-import database_reader as dr
 import random
+
+import validation
+import database_reader as dr
+
 """ Common functions """
 # check existence
 def exist_vehicle_id(id):
@@ -257,10 +262,10 @@ def invoice():
     cols = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
     treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
     treeview.column("id", width=50)
-    treeview.column("customer_id", width=50)
-    treeview.column("driver_id", width=50)
-    treeview.column("date", width=67)
-    treeview.column("payment_mode", width=70)
+    treeview.column("customer_id", width=80)
+    treeview.column("driver_id", width=80)
+    treeview.column("date", width=100)
+    treeview.column("payment_mode", width=100)
     treeview.column("distance", width=80)
     treeview.column("price_per_km", width=100)
     treeview.column("total_fee", width=70)
@@ -382,10 +387,6 @@ def vehicle():
 
 # Driver window
 def driver():
-    def delete_driver():
-        # to be continue
-        pass
-
     def load_data():
         sheet = workbook['Driver']
         list_values = list(sheet.values)
