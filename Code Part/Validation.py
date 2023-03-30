@@ -37,7 +37,7 @@ def is_valid_total_fee(total_fee):
 
 
 def is_valid_regis_num(regis_num):
-    pattern = r"^(29|30|31)[A-Z]\d\s\d{4,5}$"
+    pattern = r"^(29|30|31)-[A-Z]\d\s\d{3}(\.\d{2}|\d{1,2})$"
     return bool(re.match(pattern, regis_num))
 
 
