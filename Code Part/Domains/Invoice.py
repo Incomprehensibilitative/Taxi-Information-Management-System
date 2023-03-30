@@ -28,6 +28,9 @@ class Invoice:
         self.__distance = distance
         self.__total_fee = total_fee
 
+    def get_customer_id(self):
+        return self.__customer_id
+
     def get_id(self):
         return self.__id
 
