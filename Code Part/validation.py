@@ -1,5 +1,5 @@
 import re
-
+import database_reader as dr
 
 def is_valid_phone_number(phone_number):
     pattern = r"^\d{10,11}$"
@@ -16,35 +16,14 @@ def is_valid_date(date):
     return bool(re.match(pattern, date))
 
 
-def is_valid_rating(rate):
-    pattern = r"^[1-5]%"
-    return bool(re.match(pattern, rate))
-
-
 def is_valid_payment_mode(payment_mode):
     pattern = r"^(cash|banking)$"
     return bool(re.match(pattern, payment_mode))
 
 
-def is_valid_distance(distance):
-    pattern = r"^\d+(\.\d+)?$"
-    return bool(re.match(pattern, distance))
-
-
-def is_valid_total_fee(total_fee):
-    pattern = r"^\d+(\.\d+)?$"
-    return bool(re.match(pattern, total_fee))
-
-
 def is_valid_regis_num(regis_num):
-    pattern = r"^(29|30|31)[A-Z]\d\s\d{4,5}$"
+    pattern = r"^(29|30|31)-[A-Z]\d\s\d{3}(\.\d{2}|\d{1,2})$"
     return bool(re.match(pattern, regis_num))
-
-
-def is_valid_price(price):
-    pattern = r"^\d+(\.\d+)?$"
-    return bool(re.match(pattern, price))
-    # this is price from Vehicle and price_per_km from Invoice
 
 
 def is_valid_salary(salary):
@@ -77,11 +56,6 @@ def is_valid_vehicle_id(vehicle_id):
     return bool(re.match(pattern, vehicle_id))
 
 
-def is_valid_feedback_id(feedback_id):
-    pattern = r"^F\d+$"
-    return bool(re.match(pattern, feedback_id))
-
-
 def is_valid_invoice_id(invoice_id):
     pattern = r"^I\d+$"
     return bool(re.match(pattern, invoice_id))
@@ -90,3 +64,20 @@ def is_valid_invoice_id(invoice_id):
 def is_valid_vehicle_type(vehicle_type):
     pattern = r"^[579]S$"
     return bool(re.match(pattern, vehicle_type))
+
+def exist_vehicle_id(id):
+# check existence
+    driver_list = dr.take_driver_info()
+    vehicle_list = dr.take_vehicle_info
+    driver_vehicle_id_list = []
+    vehicle_id_list = []
+    # Check in driver whether the vehicle already belongs to other driver
+    for driver in driver_list:
+        driver_vehicle_id_list.append(driver.get_vehicle_id())
+    for vehicle in vehicle_list:
+        vehicle_id_list.append(vehicle.get_id())
+    if id not in vehicle_id_list:
+        return 0
+    if id in driver_vehicle_id_list:
+        return 1
+    
