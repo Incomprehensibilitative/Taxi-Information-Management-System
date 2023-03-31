@@ -25,7 +25,7 @@ class Vehicle:
     def get_type(self):
         return self.__type
 
-    def get_regis(self):
+    def get_regis_num(self):
         return self.__regis_num
 
     def get_price(self):

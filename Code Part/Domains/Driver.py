@@ -30,7 +30,7 @@ class Driver:
     def get_name(self):
         return self.__name
 
-    def get_phone(self):
+    def get_phone_num(self):
         return self.__phone_num
 
     def get_vehicle_id(self):
