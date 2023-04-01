@@ -37,9 +37,14 @@ class Management:
         print("It fuckfing works")
 
     def set_new_vehicle(self, values):
-        new_vehicle = Vehicle.Vehicle()
         new_vehicle.set_vehicle(values[0],values[1],values[2],values[3])
+        new_vehicle = Vehicle.Vehicle()
         self.__vehicle_list.append(new_vehicle)
+        print("It fuckfing works")
+    
+    def set_new_invoice(self, values):
+        new_invoice = Invoice.Invoice()
+        new_invoice.set_invoice(values[0],values[1],values[2],values[3],values[4],values[5], values[6], values[7])
         print("It fuckfing works")
 
     def delete_object(self, list_name, obj_id):
@@ -59,27 +64,20 @@ class Management:
                 break
 
     def update_driver(self, values):
-        # print(values)
-        # for driver in self.get_list("driver"):
-        #     print(driver.get_phone_num())
         for i, driver in enumerate(self.get_list("driver"),0):
             if driver.get_id() == values[0]:
                 self.delete_object("driver", values[0])
                 updated_driver = Driver.Driver()
                 updated_driver.set_driver(values[0],values[1],values[2],values[3],values[4],values[5], values[6])
                 self.get_list("driver").insert(i, updated_driver)
-                # for driver in self.get_list("driver"):
-                #     print(driver.get_phone_num())
                 break
 
     def update_vehicle(self, values):
-        for vehicle in self.get_list("vehicle"):
-            print(vehicle.get_id(), vehicle.get_regis_num())
         for i, vehicle in enumerate(self.get_list("vehicle"), 0):
-            if vehicle.get_id() == values[0]:
-                self.delete_object("vehicle", values[0])
+            if vehicle.get_id() == values[4]:
+                self.delete_object("vehicle", values[4])
                 updated_vehicle = Vehicle.Vehicle()
                 updated_vehicle.set_vehicle(values[0],values[1],values[2],values[3])
-                self.get_list("driver").insert(i, updated_vehicle)
+                self.get_list("vehicle").insert(i, updated_vehicle)
                 break
 
