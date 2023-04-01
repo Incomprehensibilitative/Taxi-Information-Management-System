@@ -1,4 +1,5 @@
-import Management
+import AdminGUI
 
 if __name__ == "__main__":
-    database = Management.Management()
+    
+    AdminGUI.main()
