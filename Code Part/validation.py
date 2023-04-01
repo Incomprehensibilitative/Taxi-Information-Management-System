@@ -68,7 +68,7 @@ def is_valid_vehicle_type(vehicle_type):
 def exist_vehicle_id(id):
 # check existence
     driver_list = dr.take_driver_info()
-    vehicle_list = dr.take_vehicle_info
+    vehicle_list = dr.take_vehicle_info()
     driver_vehicle_id_list = []
     vehicle_id_list = []
     # Check in driver whether the vehicle already belongs to other driver
@@ -80,4 +80,3 @@ def exist_vehicle_id(id):
         return 0
     if id in driver_vehicle_id_list:
         return 1
-    
