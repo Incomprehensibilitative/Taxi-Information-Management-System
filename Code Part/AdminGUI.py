@@ -10,7 +10,7 @@
         + Add data to database
         + Update the treeview in GUI 
 > Special: Only resolve_invoice(), this update invoice table with the newest customer use of taxi client
-
+> More detail on how the code run, read comment in Customer function, the rest will be the same
 """
 import tkinter as tk
 import tkinter.messagebox
@@ -85,14 +85,57 @@ def customer():
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
 
-    # Saving User Info
+    def select_customer_data():
+        # Disable placeholder
+        name_entry.configure(state='normal')
+        phone_num_entry.configure(state='normal')
+
+        # Clear entry boxes
+        name_entry.delete(0, "end")
+        phone_num_entry.delete(0, "end")
+
+        # Grab row to update
+        selected = treeview.focus()
+        
+        # Grab data
+        values = treeview.item(selected, 'values')
+        
+        # Output to boxes
+        name_entry.insert(0, values[1])
+        phone_num_entry.insert(0, values[2])
+
+    def update_customer_data():
+        name = name_entry.get()
+        phone_num = phone_num_entry.get()
+        if not validation.is_valid_name(name) or name == "Enter name":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+        elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+        else:
+            selected = treeview.focus()
+            values = treeview.item(selected, 'values')
+            treeview.item(selected, text="", values=(values[0], name, phone_num))
+            name_entry.delete(0, "end")
+            phone_num_entry.delete(0, "end")
+
+    # ============== Main window and Frames  ============== #
+    # Main window 
     customer_window = tk.Tk()
     customer_window.title("Customer Admin")
+
+    # Main frame
     customer_frame = ttk.Frame(customer_window)
     customer_frame.pack()
-    user_info_frame = tk.LabelFrame(customer_frame, text="Customer")
+
+    # Frame for adding and modifying informations
+    user_info_frame = tk.LabelFrame(customer_frame, text="Customer Information")
     user_info_frame.grid(row=0, column=0, padx=20, pady=10)
 
+    # Frame for deleting the data
+    delete_user_info_frame = tk.LabelFrame(customer_frame, text="Delete Customer")
+    delete_user_info_frame.grid(row=1, column=0, pady=10)
+
+    # ============== Basic information ============== #
     # name
     name_label = tk.Label(user_info_frame, text="Name")
     name_label.grid(row=0, column=0)
@@ -109,16 +152,6 @@ def customer():
     phone_num_entry.configure(state='disabled')
     phone_num_entry.grid(row=1, column=1)
 
-    # Button
-    add_button = tk.Button(user_info_frame, text="Enter data", command=enter_customer_data)
-    add_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
-
-    for widget in user_info_frame.winfo_children():
-        widget.grid_configure(padx=10, pady=5)
-
-    # Frame for deleting the data
-    delete_user_info_frame = tk.LabelFrame(customer_frame, text="Delete Customer")
-    delete_user_info_frame.grid(row=1, column=0, pady=10)
 
     # Id
     id_label = tk.Label(delete_user_info_frame, text="Customer ID")
@@ -127,9 +160,32 @@ def customer():
     id_entry.insert(0, "C#")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
+
+
+    # ============== Modification Buttons ============== #
+    # Add Button
+    add_button = tk.Button(user_info_frame, text="Enter data", command=enter_customer_data)
+    add_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+
+    # Select button
+    select_button = tk.Button(user_info_frame, text="Select data", command=select_customer_data)
+    select_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+
+    # Update button 
+    update_button = tk.Button(user_info_frame, text="Update data", command=update_customer_data)
+    update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)    
+
+    # Delete button
     delete_button = tk.Button(delete_user_info_frame, text = "Delete data", command=delete_customer_data)
     delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
 
+
+    
+    # Regriding widgets
+    for widget in user_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+
+    
     # disable placeholder
     name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
     name_entry.bind('<FocusOut>', lambda x: on_focus_out(name_entry, 'Enter name'))
@@ -139,8 +195,9 @@ def customer():
 
     id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
     id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'C#'))
-    
-    # Frame for the data loaded from the database
+
+
+    # ============== Treeview ============== #
     treeFrame = ttk.Frame(customer_frame)
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
@@ -152,7 +209,6 @@ def customer():
     treeview.column("phone_num", width=100)
     treeview.pack()
     treeScroll.config(command=treeview.yview())
-    
     load_data()
 
 
@@ -217,12 +273,11 @@ def invoice():
     invoice_frame = tk.Frame(invoice_window)
     invoice_frame.pack()
 
-
+    # ============== Treeview  ============== #
     treeFrame = ttk.Frame(invoice_frame)
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
     treeScroll.pack(side="right", fill="both")
-
     cols = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
     treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
     treeview.column("id", width=50)
@@ -233,9 +288,10 @@ def invoice():
     treeview.column("distance", width=80)
     treeview.column("price_per_km", width=150)
     treeview.column("total_fee", width=100)
-
     treeview.pack()
     treeScroll.config(command=treeview.yview())
+
+    # ============== Resolve all invoice before loading Treeview  ============== #
     resolve_invoice()
     load_data()
 
@@ -245,6 +301,7 @@ def invoice():
 
 # Vehicle window
 def vehicle():
+    # ============== Main functions ============== #
     def load_data():
         sheet = workbook['Vehicle']
         list_values = list(sheet.values)
@@ -269,7 +326,6 @@ def vehicle():
             tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
-        # Add new vehicle to database
         else:
             vehicle_sheet = workbook['Vehicle']
             
@@ -281,18 +337,58 @@ def vehicle():
             workbook.save(path)
 
             treeview.insert('', tk.END, values=row_values)
-            type_combobox.set(type_list[0])
+            type_combobox.delete(0, "end")
             regis_num_entry.delete(0, "end")
 
+    def select_vehicle_data():
+        # Disable placeholder
+        type_combobox.configure(state='normal')
+        regis_num_entry.configure(state='normal')
 
+        # Clear entry boxes
+        type_combobox.delete(0, "end")
+        regis_num_entry.delete(0, "end")
+
+        # Grab row to update
+        selected = treeview.focus()
+        
+        # Grab data
+        values = treeview.item(selected, 'values')
+
+        # Output to boxes
+        type_combobox.insert(0, values[1])
+        regis_num_entry.insert(0, values[2])
+
+    def update_vehicle_data():
+        type = type_combobox.get()
+        regis_num = regis_num_entry.get()
+        if not validation.is_valid_vehicle_type(type):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
+        elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
+        else:
+            selected = treeview.focus()
+            values = treeview.item(selected, 'values')
+            treeview.item(selected, text="", values=(values[0], type, regis_num, values[3]))
+
+    # ============== Main window and Frames  ============== #
+    # Main window 
     vehicle_window = tk.Tk()
     vehicle_window.title("New vehicle")
+
+    # Main frame 
     vehicle_frame = tk.Frame(vehicle_window)
     vehicle_frame.pack()
 
+    # Frame for adding and modifying informations
     vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Vehicle info")
     vehicle_info_frame.grid(row=0, column=0, padx=20, pady=10)
 
+    # Frame for deleting the data  
+    delete_vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Delete Vehicle")
+    delete_vehicle_info_frame.grid(row=1, column=0, pady=10)
+
+    # ============== Basic information ============== #
     # type
     type_list = ["5S", "7S", "9S"]
     type_label = tk.Label(vehicle_info_frame, text="Type")
@@ -313,13 +409,6 @@ def vehicle():
     price_label.grid(row=0, column=3)
     price_info_label = tk.Label(vehicle_info_frame, text="5S - 10,000\n7S - 13,000\n9S - 15,000")
     price_info_label.grid(row=1, column=3)
-    # Confirm button
-    button = tk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data)
-    button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
-
-    # Frame for deleting the data
-    delete_vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Delete Vehicle")
-    delete_vehicle_info_frame.grid(row=1, column=0, pady=10)
 
     # Id
     id_label = tk.Label(delete_vehicle_info_frame, text="Vehicle ID")
@@ -328,9 +417,27 @@ def vehicle():
     id_entry.insert(0, "#S###")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
+    
+    # ============== Modification Buttons ============== #
+    # Add button
+    button = tk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data)
+    button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+
+    # Select button
+    select_button = tk.Button(vehicle_info_frame, text="Select data", command=select_vehicle_data)
+    select_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+
+    # Update button 
+    update_button = tk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data)
+    update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
+    # Delete button
     delete_button = tk.Button(delete_vehicle_info_frame, text = "Delete data", command=delete_vehicle_data)
     delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
 
+    # ============== Others ============== #
+    # Regriding widgets
+    for widget in vehicle_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
 
     # Disable placeholder
     regis_num_entry.bind('<Button-1>', lambda x: on_focus_in(regis_num_entry))
@@ -338,11 +445,8 @@ def vehicle():
 
     id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
     id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, '#S###'))
-    
-
-    for widget in vehicle_info_frame.winfo_children():
-        widget.grid_configure(padx=10, pady=5)
-
+        
+     # ============== Treeview ============== #
     treeFrame = ttk.Frame(vehicle_frame)
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
@@ -417,18 +521,89 @@ def driver():
             salary_entry.delete(0, "end")
             gender_combobox.set(gender_combo_list[0])
             age_spinbox.delete(0, "end")
+    
+    def select_driver_data():
+        # Disable placeholder
+        name_entry.configure(state='normal')
+        phone_num_entry.configure(state='normal')
+        vehicle_id_entry.configure(state='normal')
+        salary_entry.configure(state='normal')
+        gender_combobox.configure(state='normal')
+        age_spinbox.configure(state='normal')
+
+        # Clear boxes
+        name_entry.delete(0, "end")
+        phone_num_entry.delete(0, "end")
+        vehicle_id_entry.delete(0, "end")
+        salary_entry.delete(0, "end")
+        gender_combobox.delete(0, "end")
+        age_spinbox.delete(0, "end")
+
+        # Grab row to update
+        selected = treeview.focus()
+        
+        # Grab data
+        values = treeview.item(selected, 'values')
+
+        # Output data to boxes
+        name_entry.insert(0, values[1])
+        phone_num_entry.insert(0, values[2])
+        vehicle_id_entry.insert(0, values[3])
+        salary_entry.insert(0, values[4])
+        gender_combobox.insert(0, values[5])
+        age_spinbox.insert(0, values[6])
 
 
+    def update_driver_data():
+        name = name_entry.get()
+        phone_num = phone_num_entry.get()
+        vehicle_id = vehicle_id_entry.get()
+        salary = salary_entry.get()
+        gender = gender_combobox.get()
+        age = age_spinbox.get()
+        if not validation.is_valid_name(name) or name == "Enter name":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+        elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+        elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
+            # need to check whether the vehicle actually exist or available for assignment also bug
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID")
+        # Need new validation
+        # elif validation.exist_vehicle_id(vehicle_id) == 1:
+        #     tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
+        elif validation.exist_vehicle_id(vehicle_id) == 0:
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist")
+        elif not validation.is_valid_gender(gender):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
+        else:
+            selected = treeview.focus()
+            values = treeview.item(selected, 'values')
+            treeview.item(selected, text="", values=(values[0], name, phone_num, vehicle_id, salary, gender, age))
+            name_entry.delete(0, "end")
+            phone_num_entry.delete(0, "end")
+            vehicle_id_entry.delete(0, "end")
+            salary_entry.delete(0, "end")
+            gender_combobox.delete(0, "end")
+            age_spinbox.delete(0, "end")
 
-    # main frame for Driver Admin
+    # ============== Main window and Frames  ============== #
+    # Main window
     driver_window = tk.Tk()
     driver_window.title("Driver Admin")
+
+    # Main frame
     driver_frame = ttk.Frame(driver_window)
     driver_frame.pack()
 
+    # Frame for adding and modifying informations
     driver_info_frame = tk.LabelFrame(driver_frame, text="Driver info")
     driver_info_frame.grid(row=0, column=0, padx=20, pady=10)
 
+    # Frame for deleting the data
+    delete_driver_info_frame = tk.LabelFrame(driver_frame, text="Delete Driver")
+    delete_driver_info_frame.grid(row=1, column=0, pady=10)
+
+    # ============== Basic information ============== #
     # name
     name_label = tk.Label(driver_info_frame, text="Name")
     name_label.grid(row=0, column=0)
@@ -436,6 +611,7 @@ def driver():
     name_entry.insert(0, "Enter name")
     name_entry.configure(state='disabled')
     name_entry.grid(row=1, column=0)
+
     # phone number
     phone_num_label = tk.Label(driver_info_frame, text="Phone Number")
     phone_num_label.grid(row=0, column=1)
@@ -443,6 +619,7 @@ def driver():
     phone_num_entry.insert(0, "0### ### ###")
     phone_num_entry.configure(state='disabled')
     phone_num_entry.grid(row=1, column=1)
+
     # vehicle_id
     vehicle_id_label = tk.Label(driver_info_frame, text="Vehicle ID")
     vehicle_id_label.grid(row=0, column=2)
@@ -450,30 +627,25 @@ def driver():
     vehicle_id_entry.insert(0, "#S###")
     vehicle_id_entry.configure(state='disabled')
     vehicle_id_entry.grid(row=1, column=2)
+
     # salary
     salary_label = tk.Label(driver_info_frame, text="Salary")
     salary_label.grid(row=2, column=0)
     salary_entry = tk.Entry(driver_info_frame)
     salary_entry.grid(row=3, column=0)
+
     # gender
     gender_combo_list = ["Male", "Female", "Other"]
     gender_label = tk.Label(driver_info_frame, text="Gender")
     gender_label.grid(row=2, column=1)
     gender_combobox = ttk.Combobox(driver_info_frame, values=gender_combo_list)
     gender_combobox.grid(row=3, column=1)
+
     # age
     age_label = tk.Label(driver_info_frame, text="Age")
     age_label.grid(row=2, column=2)
     age_spinbox = tk.Spinbox(driver_info_frame, from_=0, to=200)
     age_spinbox.grid(row=3, column=2)
-    # Confirm button
-    button = tk.Button(driver_info_frame, text="Enter data", command=enter_driver_data)
-    button.grid(row=4, column=0, sticky="news", padx=20, pady=10)
-
-
-    # Frame for deleting the data
-    delete_driver_info_frame = tk.LabelFrame(driver_frame, text="Delete Driver")
-    delete_driver_info_frame.grid(row=1, column=0, pady=10)
 
     # Id
     id_label = tk.Label(delete_driver_info_frame, text="Driver ID")
@@ -482,9 +654,27 @@ def driver():
     id_entry.insert(0, "D#")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
-    delete_button = tk.Button(delete_driver_info_frame, text = "Delete data", command=delete_driver_data)
-    delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
+    
 
+    # ============== Modification Buttons ============== #
+    # Add button
+    add_button = tk.Button(driver_info_frame, text="Enter data", command=enter_driver_data)
+    add_button.grid(row=4, column=0, sticky="news", padx=20, pady=10)
+
+    # Select button
+    select_button = tk.Button(driver_info_frame, text="Select data", command=select_driver_data)
+    select_button.grid(row=5, column=0, sticky="news", padx=20, pady=10)
+
+    # Update button 
+    update_button = tk.Button(driver_info_frame, text="Update data", command=update_driver_data)
+    update_button.grid(row=5, column=1, sticky="news", padx=20, pady=10)    
+    
+    # Delete button
+    delete_button = tk.Button(delete_driver_info_frame, text = "Delete data", command=delete_driver_data)
+    delete_button.grid(row=3, column=1,sticky="news", padx=20, pady=10)
+    
+
+    # ============== Others ============== #
     # Disable placeholder
     name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
     name_entry.bind('<FocusOut>', lambda x: on_focus_out(name_entry, 'Enter name'))
@@ -518,26 +708,27 @@ def driver():
 
 
 """The main window"""
-window = tk.Tk()
-window.title("Administration")
-window.geometry("400x400")
+def main():
+    window = tk.Tk()
+    window.title("Administration")
+    window.geometry("400x400")
 
-frame = tk.Frame(window)
-frame.pack()
+    frame = tk.Frame(window)
+    frame.pack()
 
-# Driver
-driver_button = tk.Button(frame, text="Driver Administration", command=driver)
-driver_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
+    # Driver
+    driver_button = tk.Button(frame, text="Driver Administration", command=driver)
+    driver_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
 
-# Vehicle
-vehicle_button = tk.Button(frame, text="Vehicle Administration", command=vehicle)
-vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
+    # Vehicle
+    vehicle_button = tk.Button(frame, text="Vehicle Administration", command=vehicle)
+    vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
-# Invoice
-invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
-invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+    # Invoice
+    invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
+    invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
-# Customer
-customer_button = tk.Button(frame, text="Customer Administration", command=customer)
-customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
-window.mainloop()
+    # Customer
+    customer_button = tk.Button(frame, text="Customer Administration", command=customer)
+    customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+    window.mainloop()
