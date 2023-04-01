@@ -1,4 +1,5 @@
-"""This help create basic data that need to be assigned by the system"""
+"""This help create basic data that need to be assigned by the system
+Included Random function"""
 import random
 import datetime
 import database_reader as dr
