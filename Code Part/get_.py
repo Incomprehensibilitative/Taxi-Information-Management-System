@@ -27,7 +27,7 @@ def driver_data(id):
     for driver in driver_list:
             if driver.get_id() == id:
                 driver_name = driver.get_name()
-                driver_phone_num = str(driver.get_phone_num())
+                driver_phone_num = driver.get_phone_num()
                 driver_vehicle_id = driver.get_vehicle_id()
                 driver_salary = driver.get_salary()
                 driver_gender = driver.get_gender()
