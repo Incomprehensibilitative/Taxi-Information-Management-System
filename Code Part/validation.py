@@ -80,3 +80,6 @@ def exist_vehicle_id(id):
         return 0
     if id in driver_vehicle_id_list:
         return 1
+    for driver in driver_list:
+        if driver.get_vehicle_id() == id:
+            return 2

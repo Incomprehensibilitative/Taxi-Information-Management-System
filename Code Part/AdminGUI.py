@@ -112,8 +112,13 @@ def customer(system):
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
             tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
         else:
+            # To get the id, not other values
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
+
+            # Since the values[0] == id, so we want to keep it, and change other data
+            updated_data = [values[0], name, phone_num]
+            system.update_customer(updated_data)
             treeview.item(selected, text="", values=(values[0], name, phone_num))
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
@@ -368,7 +373,16 @@ def vehicle(system):
         else:
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
-            treeview.item(selected, text="", values=(values[0], type, regis_num, values[3]))
+            if type != values[1]:
+                vehicle_id = dc.create_vehicle_id(type)
+                price = dc.create_price(type)
+                updated_data1 = [vehicle_id, type, regis_num, price]
+                system.update_vehicle(updated_data1)
+                treeview.item(selected, text="", values=(vehicle_id, type, regis_num, price))
+            else:
+                updated_data2 = [values[0], values[1], regis_num, values[3]]
+                system.update_vehicle(updated_data2)
+                treeview.item(selected, text="", values=(values[0], values[1], regis_num, values[3]))
 
     # ============== Main window and Frames  ============== #
     # Main window 
@@ -429,6 +443,7 @@ def vehicle(system):
     # Update button 
     update_button = tk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data)
     update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
+    
     # Delete button
     delete_button = tk.Button(delete_vehicle_info_frame, text = "Delete data", command=delete_vehicle_data)
     delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
@@ -566,15 +581,20 @@ def driver(system):
             # need to check whether the vehicle actually exist or available for assignment also bug
             tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID")
         # Need new validation
-        # elif validation.exist_vehicle_id(vehicle_id) == 1:
-        #     tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
+        elif validation.exist_vehicle_id(vehicle_id) == 2:
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
         elif validation.exist_vehicle_id(vehicle_id) == 0:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist")
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
         else:
+            # To get the values[0] == id, not other values
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
+
+            updated_data = [values[0], name, phone_num, vehicle_id, salary, age, gender]
+            system.update_driver(updated_data)
+
             treeview.item(selected, text="", values=(values[0], name, phone_num, vehicle_id, salary, gender, age))
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")

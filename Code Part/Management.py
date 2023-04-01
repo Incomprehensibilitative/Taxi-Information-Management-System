@@ -47,27 +47,39 @@ class Management:
         for obj in obj_list:
             if obj.get_id() == obj_id:
                 obj_list.remove(obj)
-                print("It fuckfing works")
                 break
 
     def update_customer(self, values):
-        for i, id in enumerate(self.get_list("customer").get_id(),0):
-            if values[0] == id:
+        for i, customer in enumerate(self.get_list("customer"),0):
+            if customer.get_id() == values[0]:
                 self.delete_object("customer", values[0])
-                self.get_list("customer").insert(Customer.Customer().set_customer(values[0], values[1], values[2]),i)
+                updated_customer = Customer.Customer()
+                updated_customer.set_customer(values[0], values[1], values[2])
+                self.get_list("customer").insert(i, updated_customer)
                 break
 
     def update_driver(self, values):
-        for i, id in enumerate(self.get_list("driver").get_id(),0):
-            if values[0] == id:
+        # print(values)
+        # for driver in self.get_list("driver"):
+        #     print(driver.get_phone_num())
+        for i, driver in enumerate(self.get_list("driver"),0):
+            if driver.get_id() == values[0]:
                 self.delete_object("driver", values[0])
-                self.get_list("driver").insert(Driver.Driver().set_driver(values[0],values[1],values[2],values[3],values[4],values[5], values[6]), i)
+                updated_driver = Driver.Driver()
+                updated_driver.set_driver(values[0],values[1],values[2],values[3],values[4],values[5], values[6])
+                self.get_list("driver").insert(i, updated_driver)
+                # for driver in self.get_list("driver"):
+                #     print(driver.get_phone_num())
                 break
 
     def update_vehicle(self, values):
-        for i, id in enumerate(self.get_list("vehicle").get_id(), 0):
-            if values[0] == id:
+        for vehicle in self.get_list("vehicle"):
+            print(vehicle.get_id(), vehicle.get_regis_num())
+        for i, vehicle in enumerate(self.get_list("vehicle"), 0):
+            if vehicle.get_id() == values[0]:
                 self.delete_object("vehicle", values[0])
-                self.get_list("driver").insert(Vehicle.Vehicle().set_vehicle(values[0],values[1],values[2],values[3]), i)
+                updated_vehicle = Vehicle.Vehicle()
+                updated_vehicle.set_vehicle(values[0],values[1],values[2],values[3])
+                self.get_list("driver").insert(i, updated_vehicle)
                 break
 
