@@ -18,8 +18,6 @@ from tkinter import ttk
 import openpyxl
 import random
 
-import Management
-import database_destroyer as dd
 import database_creator as dc
 import database_reader as dr
 import validation
@@ -46,7 +44,7 @@ workbook = openpyxl.load_workbook(path, data_only=True)
 
 """ New administration windows """
 # Customer window
-def customer(system):
+def customer(window, system):
     def load_data():
         sheet = workbook['Customer']
         list_values = list(sheet.values)
@@ -125,7 +123,7 @@ def customer(system):
 
     # ============== Main window and Frames  ============== #
     # Main window 
-    customer_window = tk.Tk()
+    customer_window = tk.Toplevel(window)
     customer_window.title("Customer Admin")
 
     # Main frame
@@ -220,13 +218,11 @@ def customer(system):
     customer_window.mainloop()
 
 # Invoice window
-def invoice():
+def invoice(window, system):
     def resolve_invoice():
-        invoice_sheet = workbook['Invoice']
-        customer_list = dr.take_customer_info()
-        invoice_list = dr.take_invoice_info()
-        driver_list = dr.take_driver_info()
-        invoice_list = dr.take_invoice_info()
+        customer_list = system.get_list("customer")
+        invoice_list = system.get_list("invoice")
+        driver_list = system.get_list("driver")
         
         invoice_id_list = []
         customer_id_list = []
@@ -235,12 +231,12 @@ def invoice():
         payment_mode = ["cash", "banking"]
         for invoice in invoice_list:
             invoice_id_list.append(invoice.get_id())
+            invoice_customer_id_list.append(invoice.get_customer_id())
         for driver in driver_list:
             driver_id_list.append(driver.get_id())
         for customer in customer_list:
             customer_id_list.append(customer.get_id())
-        for invoice in invoice_list:
-            invoice_customer_id_list.append(invoice.get_customer_id())
+            
         unassiged_customer = list(set(customer_id_list)- set(invoice_customer_id_list))
         for customer_id in unassiged_customer:
             invoice_id = f"I{random.randint(0, 999)}"
@@ -259,8 +255,9 @@ def invoice():
             total_fee = distance*int(price_per_km)
     
             row_values = [invoice_id, customer_id, driver_id, date, payment, distance, price_per_km, total_fee]
-            invoice_sheet.append(row_values)
-            workbook.save(path)
+            print(row_values)
+            system.set_new_invoice(row_values)
+            
             treeview.insert('', tk.END, value=row_values)            
 
     def load_data():
@@ -273,7 +270,7 @@ def invoice():
             treeview.insert('', tk.END, values=value_tuple)
 
 
-    invoice_window = tk.Tk()
+    invoice_window = tk.Toplevel(window)
     invoice_window.title("New invoice")
     invoice_frame = tk.Frame(invoice_window)
     invoice_frame.pack()
@@ -297,15 +294,15 @@ def invoice():
     treeScroll.config(command=treeview.yview())
 
     # ============== Resolve all invoice before loading Treeview  ============== #
-    resolve_invoice()
     load_data()
+    resolve_invoice()
 
 
     invoice_window.mainloop()
 
 
 # Vehicle window
-def vehicle(system):
+def vehicle(window, system):
     # ============== Main functions ============== #
     def load_data():
         sheet = workbook['Vehicle']
@@ -374,20 +371,22 @@ def vehicle(system):
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
             if type != values[1]:
-                vehicle_id = dc.create_vehicle_id(type)
-                price = dc.create_price(type)
-                updated_data1 = [vehicle_id, type, regis_num, price]
+                new_vehicle_id = dc.create_vehicle_id(type)
+                new_price = dc.create_price(type)
+                old_vehicle_id = values[0]
+                updated_data1 = [new_vehicle_id, type, regis_num, new_price, old_vehicle_id]
                 system.update_vehicle(updated_data1)
-                treeview.item(selected, text="", values=(vehicle_id, type, regis_num, price))
+                treeview.item(selected, text="", values=(new_vehicle_id, type, regis_num, new_price))
             else:
-                updated_data2 = [values[0], values[1], regis_num, values[3]]
+                updated_data2 = [values[0], values[1], regis_num, values[3], values[0]]
                 system.update_vehicle(updated_data2)
                 treeview.item(selected, text="", values=(values[0], values[1], regis_num, values[3]))
 
     # ============== Main window and Frames  ============== #
     # Main window 
-    vehicle_window = tk.Tk()
+    vehicle_window = tk.Toplevel(window)
     vehicle_window.title("New vehicle")
+    print(vehicle_window.state())
 
     # Main frame 
     vehicle_frame = tk.Frame(vehicle_window)
@@ -413,7 +412,8 @@ def vehicle(system):
     regis_num_label = tk.Label(vehicle_info_frame, text="Regis number")
     regis_num_label.grid(row=0, column=0)
     regis_num_entry = tk.Entry(vehicle_info_frame)
-    regis_num_entry.insert(0, "29–C1 233.23")
+    # the dash might create error
+    regis_num_entry.insert(0, "29-C1 233.23")
     regis_num_entry.configure(state='disabled')
     regis_num_entry.grid(row=1, column=0)
 
@@ -479,7 +479,7 @@ def vehicle(system):
 
 
 # Driver window
-def driver(system):
+def driver(window, system):
     def load_data():
         sheet = workbook['Driver']
         list_values = list(sheet.values)
@@ -605,13 +605,15 @@ def driver(system):
 
     # ============== Main window and Frames  ============== #
     # Main window
-    driver_window = tk.Tk()
+
+    driver_window = tk.Toplevel(window)
     driver_window.title("Driver Admin")
 
     # Main frame
     driver_frame = ttk.Frame(driver_window)
     driver_frame.pack()
-
+    
+ 
     # Frame for adding and modifying informations
     driver_info_frame = tk.LabelFrame(driver_frame, text="Driver info")
     driver_info_frame.grid(row=0, column=0, padx=20, pady=10)
@@ -733,21 +735,24 @@ def main(system):
 
     frame = tk.Frame(window)
     frame.pack()
-
+    
+    # ============== Open Different Administration Windows  ============== #
+    # limit number of window opened
+    
     # Driver
-    driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(system))
+    driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(window, system))
     driver_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
 
     # Vehicle
-    vehicle_button = tk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(system))
+    vehicle_button = tk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(window, system))
     vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
     # Invoice
-    invoice_button = tk.Button(frame, text="Invoice Administration", command=lambda: invoice(system))
+    invoice_button = tk.Button(frame, text="Invoice Administration", command=lambda: invoice(window, system))
     invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Customer
-    customer_button = tk.Button(frame, text="Customer Administration", command=lambda: customer(system))
+    customer_button = tk.Button(frame, text="Customer Administration", command=lambda: customer(window, system))
     customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
     window.mainloop()
