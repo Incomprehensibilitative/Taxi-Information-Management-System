@@ -1,5 +1,6 @@
 import AdminGUI
+import Management
 
 if __name__ == "__main__":
-    
-    AdminGUI.main()
+    system = Management.Management()
+    AdminGUI.main(system)

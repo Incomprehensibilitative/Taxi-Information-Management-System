@@ -17,6 +17,8 @@ import tkinter.messagebox
 from tkinter import ttk
 import openpyxl
 import random
+
+import Management
 import database_destroyer as dd
 import database_creator as dc
 import database_reader as dr
@@ -44,7 +46,7 @@ workbook = openpyxl.load_workbook(path, data_only=True)
 
 """ New administration windows """
 # Customer window
-def customer():
+def customer(system):
     def load_data():
         sheet = workbook['Customer']
         list_values = list(sheet.values)
@@ -58,7 +60,7 @@ def customer():
     def delete_customer_data():
         id = id_entry.get()
         customer_name, customer_phone_num = get_.customer_data(id)
-        dd.delete_customer(id)
+        system.delete_object("customer", id)
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, customer_name, customer_phone_num], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
@@ -74,13 +76,11 @@ def customer():
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
             tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
         else:
-            customer_sheet = workbook['Customer']
 
             customer_id = dc.create_customer_id()
             row_values = [customer_id, name, phone_num]
+            system.set_new_customer(row_values)
 
-            customer_sheet.append(row_values)
-            workbook.save(path)
             treeview.insert('', tk.END, value=row_values)
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
@@ -300,7 +300,7 @@ def invoice():
 
 
 # Vehicle window
-def vehicle():
+def vehicle(system):
     # ============== Main functions ============== #
     def load_data():
         sheet = workbook['Vehicle']
@@ -315,6 +315,7 @@ def vehicle():
     def delete_vehicle_data():
         id = id_entry.get()
         type, regis_num, price = get_.vehicle_data(id)
+        system.delete_object("vehicle", id)
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
@@ -327,14 +328,12 @@ def vehicle():
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
         else:
-            vehicle_sheet = workbook['Vehicle']
             
             vehicle_id = dc.create_vehicle_id(type)
             price = dc.create_price(type)
 
             row_values = [vehicle_id, type, regis_num, price]
-            vehicle_sheet.append(row_values)
-            workbook.save(path)
+            system.set_new_vehicle(row_values)
 
             treeview.insert('', tk.END, values=row_values)
             type_combobox.delete(0, "end")
@@ -465,7 +464,7 @@ def vehicle():
 
 
 # Driver window
-def driver():
+def driver(system):
     def load_data():
         sheet = workbook['Driver']
         list_values = list(sheet.values)
@@ -479,7 +478,7 @@ def driver():
     def delete_driver_data():
         id = id_entry.get()
         driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(id)
-        dd.delete_driver(id)
+        system.delete_object("driver", id)
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
@@ -506,13 +505,11 @@ def driver():
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
         else:
-            driver_sheet = workbook['Driver']
             # The id need to be created by the system to make sure it's unique
             driver_id = dc.create_driver_id()
             # appending the value into
             row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
-            driver_sheet.append(row_values)
-            workbook.save(path)
+            system.set_new_driver(row_values)
 
             treeview.insert('', tk.END, values=row_values)
             name_entry.delete(0, "end")
@@ -708,7 +705,8 @@ def driver():
 
 
 """The main window"""
-def main():
+def main(system):
+    # ============== Main window and Frames  ============== #
     window = tk.Tk()
     window.title("Administration")
     window.geometry("400x400")
@@ -717,18 +715,19 @@ def main():
     frame.pack()
 
     # Driver
-    driver_button = tk.Button(frame, text="Driver Administration", command=driver)
+    driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(system))
     driver_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
 
     # Vehicle
-    vehicle_button = tk.Button(frame, text="Vehicle Administration", command=vehicle)
+    vehicle_button = tk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(system))
     vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
     # Invoice
-    invoice_button = tk.Button(frame, text="Invoice Administration", command=invoice)
+    invoice_button = tk.Button(frame, text="Invoice Administration", command=lambda: invoice(system))
     invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Customer
-    customer_button = tk.Button(frame, text="Customer Administration", command=customer)
+    customer_button = tk.Button(frame, text="Customer Administration", command=lambda: customer(system))
     customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+
     window.mainloop()
