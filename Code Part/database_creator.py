@@ -13,8 +13,8 @@ def create_date():
     days_between_dates = time_between_dates.days
     random_number_of_days = random.randrange(days_between_dates)
     random_date = start_date + datetime.timedelta(days=random_number_of_days)
-
-    return random_date
+    date = str(random_date)
+    return date
 
 def create_price(vehicle_type):
     vehicle_type
