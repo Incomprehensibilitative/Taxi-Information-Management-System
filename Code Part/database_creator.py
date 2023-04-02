@@ -2,7 +2,6 @@
 Included Random function"""
 import random
 import datetime
-import database_reader as dr
 
 
 def create_date():
@@ -17,7 +16,6 @@ def create_date():
     return date
 
 def create_price(vehicle_type):
-    vehicle_type
     if vehicle_type == "5S":
         return "10000"
     elif vehicle_type == "7S":
@@ -25,31 +23,28 @@ def create_price(vehicle_type):
     elif vehicle_type == "9S":
         return "15000"
 
-def create_customer_id():
+def create_customer_id(system):
     customer_id = f"C{random.randint(0, 999)}"
-    customer_list = dr.take_customer_info()
     customer_id_list = []
-    for customer in customer_list:
+    for customer in system.get_list("customer"):
         customer_id_list.append(customer.get_id())
     while customer_id in customer_id_list:
         customer_id = f"C{random.randint(0, 999)}"
     return customer_id
 
-def create_vehicle_id(type):
+def create_vehicle_id(system, type):
     vehicle_id = f"{type}{random.randint(0,999)}"
-    vehicle_list = dr.take_vehicle_info()
     vehicle_id_list = []
-    for vehicle in vehicle_list:
+    for vehicle in system.get_list("vehicle"):
         vehicle_id_list.append(vehicle.get_id())
     while vehicle_id in vehicle_id_list:
         vehicle_id = f"{type}{random.randint(0, 999)}"
     return vehicle_id
 
-def create_driver_id():
+def create_driver_id(system):
     driver_id = f"D{random.randint(0, 999)}"
-    driver_list = dr.take_driver_info()
     driver_id_list = []
-    for driver in driver_list:
+    for driver in system.get_list("driver"):
         driver_id_list.append(driver.get_id())
     while driver_id in driver_id_list:
         driver_id = f"D{random.randint(0, 999)}"

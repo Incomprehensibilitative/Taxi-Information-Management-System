@@ -19,7 +19,6 @@ import openpyxl
 import random
 
 import database_creator as dc
-import database_reader as dr
 import validation
 import get_
 
@@ -46,14 +45,14 @@ workbook = openpyxl.load_workbook(path, data_only=True)
 # Customer window
 def customer(window, system):
     def load_data():
-        sheet = workbook['Customer']
-        list_values = list(sheet.values)
-        print(list_values)
-        for col_name in list_values[0]:
-            treeview.heading(col_name, text=col_name)
-
-        for value_tuple in list_values[1:]:
-            treeview.insert('', tk.END, values=value_tuple)
+        # define heading for the treeview
+        head = ("id", "name", "phone_num")
+        for heading_name in head:
+            treeview.heading(heading_name, text=heading_name)
+        # append customer data from customer list into treeview
+        for customer in system.get_list("customer"):
+            treeview.insert('', tk.END, values=(customer.get_id(), customer.get_name(), customer.get_phone_num()))
+        
 
     def delete_customer_data():
         id = id_entry.get()
@@ -75,7 +74,7 @@ def customer(window, system):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
         else:
 
-            customer_id = dc.create_customer_id()
+            customer_id = dc.create_customer_id(system)
             row_values = [customer_id, name, phone_num]
             system.set_new_customer(row_values)
 
@@ -261,14 +260,13 @@ def invoice(window, system):
             treeview.insert('', tk.END, value=row_values)            
 
     def load_data():
-        sheet = workbook['Invoice']
-        list_values = list(sheet.values)
-        for col_name in list_values[0]:
-            treeview.heading(col_name, text=col_name)
-
-        for value_tuple in list_values[1:]:
-            treeview.insert('', tk.END, values=value_tuple)
-
+        head = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
+        for head_name in head:
+            treeview.heading(head_name, text=head_name)
+        
+        for invoice in system.get_list("invoice"):
+            treeview.insert('', tk.END, values=(invoice.get_id(), invoice.get_customer_id(), invoice.get_driver_id(), invoice.get_date(),
+                                                invoice.get_payment_mode(), invoice.get_distance(), invoice.get_price_per_km(), invoice.get_total()))
 
     invoice_window = tk.Toplevel(window)
     invoice_window.title("New invoice")
@@ -305,14 +303,12 @@ def invoice(window, system):
 def vehicle(window, system):
     # ============== Main functions ============== #
     def load_data():
-        sheet = workbook['Vehicle']
-        list_values = list(sheet.values)
-        print(list_values)
-        for col_name in list_values[0]:
-            treeview.heading(col_name, text=col_name)
+        head = ("id", "type", "regis_num", "price")
+        for heading_name in head:
+            treeview.heading(heading_name, text=heading_name)
 
-        for value_tuple in list_values[1:]:
-            treeview.insert('', tk.END, values=value_tuple)
+        for vehicle in system.get_list("vehicle"):
+            treeview.insert('', tk.END, values=(vehicle.get_id(), vehicle.get_type(), vehicle.get_regis_num(), vehicle.get_price()))
 
     def delete_vehicle_data():
         id = id_entry.get()
@@ -331,7 +327,7 @@ def vehicle(window, system):
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
         else:
             
-            vehicle_id = dc.create_vehicle_id(type)
+            vehicle_id = dc.create_vehicle_id(system, type)
             price = dc.create_price(type)
 
             row_values = [vehicle_id, type, regis_num, price]
@@ -371,7 +367,7 @@ def vehicle(window, system):
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
             if type != values[1]:
-                new_vehicle_id = dc.create_vehicle_id(type)
+                new_vehicle_id = dc.create_vehicle_id(system, type)
                 new_price = dc.create_price(type)
                 old_vehicle_id = values[0]
                 updated_data1 = [new_vehicle_id, type, regis_num, new_price, old_vehicle_id]
@@ -386,7 +382,6 @@ def vehicle(window, system):
     # Main window 
     vehicle_window = tk.Toplevel(window)
     vehicle_window.title("New vehicle")
-    print(vehicle_window.state())
 
     # Main frame 
     vehicle_frame = tk.Frame(vehicle_window)
@@ -481,14 +476,12 @@ def vehicle(window, system):
 # Driver window
 def driver(window, system):
     def load_data():
-        sheet = workbook['Driver']
-        list_values = list(sheet.values)
-        print(list_values)
-        for col_name in list_values[0]:
-            treeview.heading(col_name, text=col_name)
+        head = ("id", "name", "phone_num", "vehicle_id", "salary", "gender", "age")
+        for heading_name in head:
+            treeview.heading(heading_name, text=heading_name)
 
-        for value_tuple in list_values[1:]:
-            treeview.insert('', tk.END, values=value_tuple)
+        for driver in system.get_list("driver"):
+            treeview.insert('', tk.END, values=(driver.get_id(), driver.get_name(), driver.get_phone_num(), driver.get_vehicle_id(), driver.get_salary(), driver.get_gender(), driver.get_age()))
 
     def delete_driver_data():
         id = id_entry.get()
@@ -513,15 +506,15 @@ def driver(window, system):
         elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
             # need to check whether the vehicle actually exist or available for assignment also bug
             tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID")
-        elif validation.exist_vehicle_id(vehicle_id) == 1:
+        elif validation.exist_vehicle_id(system, vehicle_id) == 1:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
-        elif validation.exist_vehicle_id(vehicle_id) == 0:
+        elif validation.exist_vehicle_id(system, vehicle_id) == 0:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist")
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
         else:
             # The id need to be created by the system to make sure it's unique
-            driver_id = dc.create_driver_id()
+            driver_id = dc.create_driver_id(system)
             # appending the value into
             row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
             system.set_new_driver(row_values)
@@ -581,9 +574,9 @@ def driver(window, system):
             # need to check whether the vehicle actually exist or available for assignment also bug
             tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID")
         # Need new validation
-        elif validation.exist_vehicle_id(vehicle_id) == 2:
+        elif validation.exist_vehicle_id(system, vehicle_id) == 2:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
-        elif validation.exist_vehicle_id(vehicle_id) == 0:
+        elif validation.exist_vehicle_id(system, vehicle_id) == 0:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist")
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
@@ -725,6 +718,11 @@ def driver(window, system):
     load_data()
     driver_window.mainloop()
 
+# Saving the data to excel when closing the GUI
+def on_closing(window):
+    if tkinter.messagebox.askokcancel("Quit", "Do you want to quit, all changes will be save to database"):
+        window.destroy()
+
 
 """The main window"""
 def main(system):
@@ -754,5 +752,8 @@ def main(system):
     # Customer
     customer_button = tk.Button(frame, text="Customer Administration", command=lambda: customer(window, system))
     customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+
+    # Check if window is being close
+    window.protocol("WM_DELETE_WINDOW", lambda: on_closing(window))
 
     window.mainloop()
