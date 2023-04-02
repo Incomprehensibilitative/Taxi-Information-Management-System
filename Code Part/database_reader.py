@@ -47,4 +47,3 @@ def take_invoice_info():
                                 row[6].value, row[7].value)
         invoice_list.append(new_invoice)
     return invoice_list
-

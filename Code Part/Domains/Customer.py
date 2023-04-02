@@ -18,9 +18,6 @@ class Customer:
         self.__phone_num = phone_num
         self.__chosen_vehicle = type
 
-    def get_chosen_vehicle(self):
-        return self.__chosen_vehicle
-
     def get_id(self):
         return self.__id
 
@@ -29,3 +26,6 @@ class Customer:
 
     def get_phone_num(self):
         return self.__phone_num
+
+    def get_chosen_vehicle(self):
+        return self.__chosen_vehicle

@@ -1,5 +1,5 @@
 import re
-import database_reader as dr
+
 
 def is_valid_phone_number(phone_number):
     pattern = r"^\d{10,11}$"
@@ -60,19 +60,15 @@ def is_valid_vehicle_type(vehicle_type):
     pattern = r"^[579]S$"
     return bool(re.match(pattern, vehicle_type))
 
-def exist_vehicle_id(system, id):
-# check existence
-    driver_vehicle_id_list = []
-    vehicle_id_list = []
-    # Check in driver whether the vehicle already belongs to other driver
-    for driver in system.get_list("driver"):
-        driver_vehicle_id_list.append(driver.get_vehicle_id())
-    for vehicle in system.get_list("vehicle"):
-        vehicle_id_list.append(vehicle.get_id())
-    if id not in vehicle_id_list:
+
+def exist_vehicle_id(system, vehicle_id):
+    # Check if the vehicle ID already exists in the system
+    vehicle_id_list = [vehicle.get_id() for vehicle in system.get_list("vehicle")]
+    if vehicle_id not in vehicle_id_list:
         return 0
-    if id in driver_vehicle_id_list:
+
+    # Check if the vehicle is already assigned to a driver
+    driver_vehicle_id_list = [driver.get_vehicle_id() for driver in system.get_list("driver")]
+    if vehicle_id in driver_vehicle_id_list:
         return 1
-    for driver in system.get_list("driver"):
-        if driver.get_vehicle_id() == id:
-            return 2
+    return 2

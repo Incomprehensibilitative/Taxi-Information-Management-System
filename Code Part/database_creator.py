@@ -15,6 +15,7 @@ def create_date():
     date = str(random_date)
     return date
 
+
 def create_price(vehicle_type):
     if vehicle_type == "5S":
         return "10000"
@@ -22,6 +23,7 @@ def create_price(vehicle_type):
         return "13000"
     elif vehicle_type == "9S":
         return "15000"
+
 
 def create_customer_id(system):
     customer_id = f"C{random.randint(0, 999)}"
@@ -32,14 +34,16 @@ def create_customer_id(system):
         customer_id = f"C{random.randint(0, 999)}"
     return customer_id
 
+
 def create_vehicle_id(system, type):
-    vehicle_id = f"{type}{random.randint(0,999)}"
+    vehicle_id = f"{type}{random.randint(0, 999)}"
     vehicle_id_list = []
     for vehicle in system.get_list("vehicle"):
         vehicle_id_list.append(vehicle.get_id())
     while vehicle_id in vehicle_id_list:
         vehicle_id = f"{type}{random.randint(0, 999)}"
     return vehicle_id
+
 
 def create_driver_id(system):
     driver_id = f"D{random.randint(0, 999)}"
@@ -49,4 +53,3 @@ def create_driver_id(system):
     while driver_id in driver_id_list:
         driver_id = f"D{random.randint(0, 999)}"
     return driver_id
-

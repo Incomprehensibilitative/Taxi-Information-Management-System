@@ -30,4 +30,3 @@ class Vehicle:
 
     def get_price(self):
         return self.__price
-
