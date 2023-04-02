@@ -34,6 +34,9 @@ class Invoice:
     def get_id(self):
         return self.__id
 
+    def get_driver_id(self):
+        return self.__driver_id
+
     def get_date(self):
         return self.__date
 
@@ -43,7 +46,7 @@ class Invoice:
     def get_distance(self):
         return self.__distance
 
-    def get_price_per_kn(self):
+    def get_price_per_km(self):
         return self.__price_per_km
 
     def get_total(self):
