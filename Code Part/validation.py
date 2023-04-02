@@ -65,21 +65,19 @@ def is_valid_vehicle_type(vehicle_type):
     pattern = r"^[579]S$"
     return bool(re.match(pattern, vehicle_type))
 
-def exist_vehicle_id(id):
+def exist_vehicle_id(system, id):
 # check existence
-    driver_list = dr.take_driver_info()
-    vehicle_list = dr.take_vehicle_info()
     driver_vehicle_id_list = []
     vehicle_id_list = []
     # Check in driver whether the vehicle already belongs to other driver
-    for driver in driver_list:
+    for driver in system.get_list("driver"):
         driver_vehicle_id_list.append(driver.get_vehicle_id())
-    for vehicle in vehicle_list:
+    for vehicle in system.get_list("vehicle"):
         vehicle_id_list.append(vehicle.get_id())
     if id not in vehicle_id_list:
         return 0
     if id in driver_vehicle_id_list:
         return 1
-    for driver in driver_list:
+    for driver in system.get_list("driver"):
         if driver.get_vehicle_id() == id:
             return 2
