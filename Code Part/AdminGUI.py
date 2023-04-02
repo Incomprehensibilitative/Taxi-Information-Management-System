@@ -47,20 +47,20 @@ workbook = openpyxl.load_workbook(path, data_only=True)
 def customer(window, system):
     def load_data():
         # define heading for the treeview
-        head = ("id", "name", "phone_num")
+        head = ("id", "name", "phone_num", "chosen_vehicle")
         for heading_name in head:
             treeview.heading(heading_name, text=heading_name)
         # append customer data from customer list into treeview
         for customer in system.get_list("customer"):
-            treeview.insert('', tk.END, values=(customer.get_id(), customer.get_name(), customer.get_phone_num()))
+            treeview.insert('', tk.END, values=(customer.get_id(), customer.get_name(), customer.get_phone_num(), customer.get_chosen_vehicle()))
         
 
     def delete_customer_data():
         id = id_entry.get()
-        customer_name, customer_phone_num = get_.customer_data(id)
+        customer_name, customer_phone_num, customer_chosen_vehicle = get_.customer_data(system, id)
         system.delete_object("customer", id)
         for row in treeview.get_children():
-            if treeview.item(row) == {'text': '', 'image': '', 'values': [id, customer_name, customer_phone_num], 'open': 0, 'tags': ''}:
+            if treeview.item(row) == {'text': '', 'image': '', 'values': [id, customer_name, customer_phone_num, customer_chosen_vehicle], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
         id_entry.delete(0, "end")
         
@@ -68,15 +68,17 @@ def customer(window, system):
     def enter_customer_data():
         name = name_entry.get()
         phone_num = phone_num_entry.get()
-
+        chosen_vehicle = chosen_vehicle_combobox.get()
         if not validation.is_valid_name(name) or name == "Enter name":
             tkinter.messagebox.showwarning(title="Error", message="Invalid name")
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
             tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+        elif not validation.is_valid_vehicle_type(chosen_vehicle):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
         else:
 
             customer_id = dc.create_customer_id(system)
-            row_values = [customer_id, name, phone_num]
+            row_values = [customer_id, name, phone_num, chosen_vehicle]
             system.set_new_customer(row_values)
 
             treeview.insert('', tk.END, value=row_values)
@@ -87,6 +89,7 @@ def customer(window, system):
         # Disable placeholder
         name_entry.configure(state='normal')
         phone_num_entry.configure(state='normal')
+        
 
         # Clear entry boxes
         name_entry.delete(0, "end")
@@ -101,6 +104,8 @@ def customer(window, system):
         # Output to boxes
         name_entry.insert(0, values[1])
         phone_num_entry.insert(0, values[2])
+        chosen_vehicle_combobox.insert(0, values[3])
+        chosen_vehicle_combobox.configure(state='disabled')
 
     def update_customer_data():
         name = name_entry.get()
@@ -113,11 +118,11 @@ def customer(window, system):
             # To get the id, not other values
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
-
+            print(values)
             # Since the values[0] == id, so we want to keep it, and change other data
-            updated_data = [values[0], name, phone_num]
+            updated_data = [values[0], name, phone_num, values[3]]
             system.update_customer(updated_data)
-            treeview.item(selected, text="", values=(values[0], name, phone_num))
+            treeview.item(selected, text="", values=(values[0], name, phone_num, values[3]))
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
 
@@ -154,7 +159,13 @@ def customer(window, system):
     phone_num_entry.insert(0, "0### ### ###")
     phone_num_entry.configure(state='disabled')
     phone_num_entry.grid(row=1, column=1)
-
+    
+    #Chosen vehicle
+    type_list = ["5S", "7S", "9S"]
+    chosen_vehicle_label = tk.Label(user_info_frame, text="Type")
+    chosen_vehicle_label.grid(row=0, column=2)
+    chosen_vehicle_combobox = ttk.Combobox(user_info_frame, values=type_list)
+    chosen_vehicle_combobox.grid(row=1, column=2)
 
     # Id
     id_label = tk.Label(delete_user_info_frame, text="Customer ID")
@@ -183,7 +194,6 @@ def customer(window, system):
     delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
 
 
-    
     # Regriding widgets
     for widget in user_info_frame.winfo_children():
         widget.grid_configure(padx=10, pady=5)
@@ -205,11 +215,12 @@ def customer(window, system):
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
     treeScroll.pack(side="right", fill="both")
-    cols = ("id", "name", "phone_num")
+    cols = ("id", "name", "phone_num", "chosen_vehicle")
     treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
     treeview.column("id", width=50)
     treeview.column("name", width=100)
     treeview.column("phone_num", width=100)
+    treeview.column("chosen_vehicle", width=150)
     treeview.pack()
     treeScroll.config(command=treeview.yview())
     load_data()
@@ -224,15 +235,19 @@ def invoice(window, system):
         customer_id_list = []
         invoice_customer_id_list = []
         driver_id_list = []
+        customer_chosen_vehicle_list = []
         payment_mode = ["cash", "banking"]
 
         for invoice in system.get_list("invoice"):
             invoice_id_list.append(invoice.get_id())
             invoice_customer_id_list.append(invoice.get_customer_id())
+
         for driver in system.get_list("driver"):
             driver_id_list.append(driver.get_id())
+
         for customer in system.get_list("customer"):
             customer_id_list.append(customer.get_id())
+            customer_chosen_vehicle_list.append(customer.get_chosen_vehicle)
             
         unassigned_customer = []
         for element in customer_id_list:
@@ -240,20 +255,23 @@ def invoice(window, system):
                 unassigned_customer.append(element)
 
         for customer_id in unassigned_customer:
+            customer_name, customer_phone_num, customer_chosen_vehicle = get_.customer_data(system, customer_id)
             invoice_id = f"I{random.randint(0, 999)}"
             while invoice_id in invoice_id_list:
                 invoice_id = f"I{random.randint(0, 999)}"
-            driver_id = random.choice(driver_id_list)
+
             for driver in system.get_list("driver"):
-                if driver.get_id() == driver_id:
-                    vehicle_id = driver.get_vehicle_id()
+                driver_vehicle_id = driver.get_vehicle_id()
+                driver_vehicle_type = driver_vehicle_id[:2]
+                if driver_vehicle_type == customer_chosen_vehicle:
+                    driver_id = driver.get_id()          
+
 
             # need a date randomizer
             date = dc.create_date()
             payment = random.choice(payment_mode)
             distance = random.randint(0, 100)
-            vehicle_type = vehicle_id[:2]
-            price_per_km = dc.create_price(vehicle_type)
+            price_per_km = dc.create_price(customer_chosen_vehicle)
             total_fee = distance*int(price_per_km)
     
             row_values = [invoice_id, customer_id, driver_id, date, payment, distance, price_per_km, total_fee]
@@ -314,7 +332,7 @@ def vehicle(window, system):
 
     def delete_vehicle_data():
         id = id_entry.get()
-        type, regis_num, price = get_.vehicle_data(id)
+        type, regis_num, price = get_.vehicle_data(system, id)
         system.delete_object("vehicle", id)
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price], 'open': 0, 'tags': ''}:
@@ -487,7 +505,7 @@ def driver(window, system):
 
     def delete_driver_data():
         id = id_entry.get()
-        driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(id)
+        driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(system, id)
         system.delete_object("driver", id)
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age], 'open': 0, 'tags': ''}:
@@ -742,19 +760,19 @@ def main(system):
     
     # Driver
     driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(window, system))
-    driver_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
+    driver_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
     # Vehicle
     vehicle_button = tk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(window, system))
-    vehicle_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
+    vehicle_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
 
     # Invoice
-    invoice_button = tk.Button(frame, text="Invoice Administration", command=lambda: invoice(window, system))
-    invoice_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+    invoice_button = tk.Button(frame, text="Print Invoice", command=lambda: invoice(window, system))
+    invoice_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
     # Customer
     customer_button = tk.Button(frame, text="Customer Administration", command=lambda: customer(window, system))
-    customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+    customer_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Check if window is being close
     window.protocol("WM_DELETE_WINDOW", lambda: on_closing(window, system))

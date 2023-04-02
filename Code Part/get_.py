@@ -1,20 +1,16 @@
-import database_reader as dr
-
 """Get the class object data given it unique id"""
 
-def customer_data(id):
-    customer_list = dr.take_customer_info()
-    for customer in customer_list:
-            if customer.get_id() == id:
-                customer_name = customer.get_name()
-                customer_phone_num = customer.get_phone_num()
+def customer_data(system, id):
+    for customer in system.get_list("customer"):
+        if customer.get_id() == id:
+            customer_name = customer.get_name()
+            customer_phone_num = customer.get_phone_num()
+            customer_chosen_vehicle = customer.get_chosen_vehicle()
     customer_phone_num_without0 = int(customer_phone_num[1:])
+    return customer_name, customer_phone_num_without0, customer_chosen_vehicle
 
-    return customer_name, customer_phone_num_without0 
-
-def vehicle_data(id):
-    vehicle_list = dr.take_vehicle_info()
-    for vehicle in vehicle_list:
+def vehicle_data(system, id):
+    for vehicle in system.get_list("vehicle"):
         if vehicle.get_id() == id:
             type = vehicle.get_type()
             regis_num = vehicle.get_regis_num()
@@ -22,9 +18,8 @@ def vehicle_data(id):
     price_int = int(price)
     return type, regis_num, price_int
 
-def driver_data(id):
-    driver_list = dr.take_driver_info()
-    for driver in driver_list:
+def driver_data(system, id):
+    for driver in system.get_list("driver"):
             if driver.get_id() == id:
                 driver_name = driver.get_name()
                 driver_phone_num = driver.get_phone_num()

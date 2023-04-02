@@ -7,7 +7,7 @@ def write_data(system):
     sheet1 = data['Customer']
     sheet1.delete_rows(2, sheet1.max_row-1)
     for cus in system.get_list("customer"):
-        sheet1.append((cus.get_id(), cus.get_name(), cus.get_phone_num()))
+        sheet1.append((cus.get_id(), cus.get_name(), cus.get_phone_num(), cus.get_chosen_vehicle()))
     
     # rewrite data for "Driver" sheet:
     sheet2 = data['Driver']

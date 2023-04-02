@@ -10,11 +10,16 @@ class Customer:
         self.__id = None
         self.__name = None
         self.__phone_num = None
+        self.__chosen_vehicle = None
 
-    def set_customer(self, id, name, phone_num):
+    def set_customer(self, id, name, phone_num, type):
         self.__id = id
         self.__name = name
         self.__phone_num = phone_num
+        self.__chosen_vehicle = type
+
+    def get_chosen_vehicle(self):
+        return self.__chosen_vehicle
 
     def get_id(self):
         return self.__id

@@ -26,7 +26,7 @@ class Management:
 
     def set_new_customer(self, values):
         new_customer = Customer.Customer()
-        new_customer.set_customer(values[0], values[1], values[2])
+        new_customer.set_customer(values[0], values[1], values[2], values[3])
         self.__customer_list.append(new_customer)
         print("It fuckfing works")
 
@@ -60,7 +60,7 @@ class Management:
             if customer.get_id() == values[0]:
                 self.delete_object("customer", values[0])
                 updated_customer = Customer.Customer()
-                updated_customer.set_customer(values[0], values[1], values[2])
+                updated_customer.set_customer(values[0], values[1], values[2], values[3])
                 self.get_list("customer").insert(i, updated_customer)
                 break
 
