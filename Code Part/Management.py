@@ -45,6 +45,7 @@ class Management:
     def set_new_invoice(self, values):
         new_invoice = Invoice.Invoice()
         new_invoice.set_invoice(values[0],values[1],values[2],values[3],values[4],values[5], values[6], values[7])
+        self.__invoice_list.append(new_invoice)
         print("It fuckfing works")
 
     def delete_object(self, list_name, obj_id):

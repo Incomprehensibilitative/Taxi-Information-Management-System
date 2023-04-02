@@ -11,11 +11,6 @@ def is_valid_name(name):
     return bool(re.match(pattern, name))
 
 
-def is_valid_date(date):
-    pattern = r"^(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])/(\d{4})$"
-    return bool(re.match(pattern, date))
-
-
 def is_valid_payment_mode(payment_mode):
     pattern = r"^(cash|banking)$"
     return bool(re.match(pattern, payment_mode))

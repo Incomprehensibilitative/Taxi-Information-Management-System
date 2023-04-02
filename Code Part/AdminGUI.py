@@ -19,6 +19,7 @@ import openpyxl
 import random
 
 import database_creator as dc
+import database_writer as dw
 import validation
 import get_
 
@@ -219,32 +220,34 @@ def customer(window, system):
 # Invoice window
 def invoice(window, system):
     def resolve_invoice():
-        customer_list = system.get_list("customer")
-        invoice_list = system.get_list("invoice")
-        driver_list = system.get_list("driver")
-        
         invoice_id_list = []
         customer_id_list = []
         invoice_customer_id_list = []
         driver_id_list = []
         payment_mode = ["cash", "banking"]
-        for invoice in invoice_list:
+
+        for invoice in system.get_list("invoice"):
             invoice_id_list.append(invoice.get_id())
             invoice_customer_id_list.append(invoice.get_customer_id())
-        for driver in driver_list:
+        for driver in system.get_list("driver"):
             driver_id_list.append(driver.get_id())
-        for customer in customer_list:
+        for customer in system.get_list("customer"):
             customer_id_list.append(customer.get_id())
             
-        unassiged_customer = list(set(customer_id_list)- set(invoice_customer_id_list))
-        for customer_id in unassiged_customer:
+        unassigned_customer = []
+        for element in customer_id_list:
+            if element not in invoice_customer_id_list:
+                unassigned_customer.append(element)
+
+        for customer_id in unassigned_customer:
             invoice_id = f"I{random.randint(0, 999)}"
             while invoice_id in invoice_id_list:
                 invoice_id = f"I{random.randint(0, 999)}"
             driver_id = random.choice(driver_id_list)
-            for driver in driver_list:
+            for driver in system.get_list("driver"):
                 if driver.get_id() == driver_id:
                     vehicle_id = driver.get_vehicle_id()
+
             # need a date randomizer
             date = dc.create_date()
             payment = random.choice(payment_mode)
@@ -254,7 +257,6 @@ def invoice(window, system):
             total_fee = distance*int(price_per_km)
     
             row_values = [invoice_id, customer_id, driver_id, date, payment, distance, price_per_km, total_fee]
-            print(row_values)
             system.set_new_invoice(row_values)
             
             treeview.insert('', tk.END, value=row_values)            
@@ -719,8 +721,9 @@ def driver(window, system):
     driver_window.mainloop()
 
 # Saving the data to excel when closing the GUI
-def on_closing(window):
+def on_closing(window, system):
     if tkinter.messagebox.askokcancel("Quit", "Do you want to quit, all changes will be save to database"):
+        dw.write_data(system)
         window.destroy()
 
 
@@ -754,6 +757,6 @@ def main(system):
     customer_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
     # Check if window is being close
-    window.protocol("WM_DELETE_WINDOW", lambda: on_closing(window))
+    window.protocol("WM_DELETE_WINDOW", lambda: on_closing(window, system))
 
     window.mainloop()
