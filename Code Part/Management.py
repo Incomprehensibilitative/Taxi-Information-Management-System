@@ -38,7 +38,7 @@ class Management:
 
     def set_new_vehicle(self, values):
         new_vehicle = Vehicle.Vehicle()
-        new_vehicle.set_vehicle(values[0],values[1],values[2],values[3])
+        new_vehicle.set_vehicle(values[0],values[1],values[2],values[3], values[4])
         self.__vehicle_list.append(new_vehicle)
         print("It fuckfing works")
     

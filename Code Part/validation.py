@@ -1,5 +1,4 @@
 import re
-import database_reader as dr
 
 def is_valid_phone_number(phone_number):
     pattern = r"^\d{10,11}$"

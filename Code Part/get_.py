@@ -18,6 +18,12 @@ def vehicle_data(system, id):
     price_int = int(price)
     return type, regis_num, price_int
 
+def vehicle_assignment(system, id):
+    for vehicle in system.get_list("vehicle"):
+        if vehicle.get_id() == id:
+            vehicle.set_assigned()
+
+
 def driver_data(system, id):
     for driver in system.get_list("driver"):
             if driver.get_id() == id:
