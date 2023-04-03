@@ -15,6 +15,15 @@ def create_date():
     date = str(random_date)
     return date
 
+def create_unassign_vehicle_list(system):
+    vehicle_id_list = []
+
+    for vehicle in system.get_list("vehicle"):
+        if vehicle.get_assigned() == "false":
+            vehicle_id_list.append(vehicle.get_id())
+
+    return vehicle_id_list
+
 
 def create_price(vehicle_type):
     if vehicle_type == "5S":

@@ -347,8 +347,8 @@ def vehicle(window, system):
 
             vehicle_id = dc.create_vehicle_id(system, type)
             price = dc.create_price(type)
-
-            row_values = [vehicle_id, type, regis_num, price]
+            assign = "false"
+            row_values = [vehicle_id, type, regis_num, price, assign]
             system.set_new_vehicle(row_values)
 
             treeview.insert('', tk.END, values=row_values)
@@ -494,12 +494,16 @@ def vehicle(window, system):
 # Driver window
 def driver(window, system):
     def load_data():
-        head = ("id", "name", "phone_num", "vehicle_id", "salary", "gender", "age")
-        for heading_name in head:
+        head_driver = ("id", "name", "phone_num", "vehicle_id", "salary", "gender", "age")
+        for heading_name in head_driver:
             treeview.heading(heading_name, text=heading_name)
-
         for driver in system.get_list("driver"):
             treeview.insert('', tk.END, values=(driver.get_id(), driver.get_name(), driver.get_phone_num(), driver.get_vehicle_id(), driver.get_salary(), driver.get_gender(), driver.get_age()))
+
+        head_vehicle = ("unassign_vehicle_id")
+        treeview_vehicle.heading(head_vehicle, text=head_vehicle)
+        for vehicle in dc.create_unassign_vehicle_list(system):
+            treeview_vehicle.insert('', tk.END, values=(vehicle))
 
     def delete_driver_data():
         id = id_entry.get()
@@ -534,10 +538,16 @@ def driver(window, system):
             # The id need to be created by the system to make sure it's unique
             driver_id = dc.create_driver_id(system)
             # appending the value into
+            get_.vehicle_assignment(system, vehicle_id)
             row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
             system.set_new_driver(row_values)
 
             treeview.insert('', tk.END, values=row_values)
+
+            for row in treeview_vehicle.get_children():
+                if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0, 'tags': ''}:
+                    treeview_vehicle.delete(row)
+
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
             vehicle_id_entry.delete(0, "end")
@@ -605,7 +615,7 @@ def driver(window, system):
 
             updated_data = [values[0], name, phone_num, vehicle_id, salary, age, gender]
             system.update_driver(updated_data)
-
+            
             treeview.item(selected, text="", values=(values[0], name, phone_num, vehicle_id, salary, gender, age))
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
@@ -733,6 +743,18 @@ def driver(window, system):
     treeview.column("age", width=50)
     treeview.pack()
     treeScroll.config(command=treeview.yview())
+
+    # ============== Treeview to show avaiavle vehicle ============== #
+    treeFrame_vehicle = ttk.Frame(driver_frame)
+    treeFrame_vehicle.grid(row=0, column=2, pady=10)
+    treeScroll_vehicle = ttk.Scrollbar(treeFrame_vehicle)
+    treeScroll_vehicle.pack(side="right", fill="y")
+    cols_vehicle = ("unassign_vehicle_id")
+    treeview_vehicle = ttk.Treeview(treeFrame_vehicle, show="headings", yscrollcommand=treeScroll_vehicle.set, columns=cols_vehicle, height=13)
+    treeview_vehicle.column("unassign_vehicle_id", width=150)
+    treeview_vehicle.pack()
+    treeScroll_vehicle.config(command=treeview_vehicle.yview())
+
     load_data()
     driver_window.mainloop()
 

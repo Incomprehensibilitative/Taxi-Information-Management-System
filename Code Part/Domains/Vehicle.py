@@ -12,12 +12,20 @@ class Vehicle:
         self.__type = None
         self.__regis_num = None
         self.__price = None
+        self.__assigened = None
 
-    def set_vehicle(self, id, type, regis_num, price):
+    def set_vehicle(self, id, type, regis_num, price, assign):
         self.__id = id
         self.__type = type
         self.__regis_num = regis_num
         self.__price = price
+        self.__assigened = assign
+
+    def set_assigned(self):
+        self.__assigened = "true"
+
+    def get_assigned(self):
+        return self.__assigened
 
     def get_id(self):
         return self.__id
