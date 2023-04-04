@@ -53,7 +53,7 @@ def customer(window, system):
         # append customer data from customer list into treeview
         for customer in system.get_list("customer"):
             treeview.insert('', tk.END, values=(customer.get_id(), customer.get_name(), customer.get_phone_num(), customer.get_chosen_vehicle()))
-        
+
 
     def delete_customer_data():
         id = id_entry.get()
@@ -63,18 +63,18 @@ def customer(window, system):
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, customer_name, customer_phone_num, customer_chosen_vehicle], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
         id_entry.delete(0, "end")
-        
+
 
     def enter_customer_data():
         name = name_entry.get()
         phone_num = phone_num_entry.get()
         chosen_vehicle = chosen_vehicle_combobox.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent= customer_window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent= customer_window)
         elif not validation.is_valid_vehicle_type(chosen_vehicle):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent= customer_window)
         else:
 
             customer_id = dc.create_customer_id(system)
@@ -89,31 +89,31 @@ def customer(window, system):
         # Disable placeholder
         name_entry.configure(state='normal')
         phone_num_entry.configure(state='normal')
-        
 
         # Clear entry boxes
         name_entry.delete(0, "end")
         phone_num_entry.delete(0, "end")
+        chosen_vehicle_combobox.delete(0, "end")
 
         # Grab row to update
         selected = treeview.focus()
-        
+
         # Grab data
         values = treeview.item(selected, 'values')
-        
+
         # Output to boxes
         name_entry.insert(0, values[1])
         phone_num_entry.insert(0, values[2])
         chosen_vehicle_combobox.insert(0, values[3])
-        chosen_vehicle_combobox.configure(state='disabled')
+        # chosen_vehicle_combobox.configure(state='disabled')
 
     def update_customer_data():
         name = name_entry.get()
         phone_num = phone_num_entry.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=customer_window, icon="warning")
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=customer_window)
         else:
             # To get the id, not other values
             selected = treeview.focus()
@@ -125,6 +125,11 @@ def customer(window, system):
             treeview.item(selected, text="", values=(values[0], name, phone_num, values[3]))
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
+    
+    def clear_customer_data():
+        name_entry.delete(0, "end")
+        phone_num_entry.delete(0, "end")
+        chosen_vehicle_combobox.delete(0, "end")
 
     # ============== Main window and Frames  ============== #
     # Main window 
@@ -159,7 +164,7 @@ def customer(window, system):
     phone_num_entry.insert(0, "0### ### ###")
     phone_num_entry.configure(state='disabled')
     phone_num_entry.grid(row=1, column=1)
-    
+
     #Chosen vehicle
     type_list = ["5S", "7S", "9S"]
     chosen_vehicle_label = tk.Label(user_info_frame, text="Type")
@@ -187,18 +192,22 @@ def customer(window, system):
 
     # Update button 
     update_button = tk.Button(user_info_frame, text="Update data", command=update_customer_data)
-    update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)    
+    update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
+
+    # Clear button
+    clear_button = tk.Button(user_info_frame, text="Clear data", command=clear_customer_data)
+    clear_button.grid(row=3, column=2, sticky="news", padx=20, pady=10)
 
     # Delete button
     delete_button = tk.Button(delete_user_info_frame, text = "Delete data", command=delete_customer_data)
     delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
 
-
+    
     # Regriding widgets
     for widget in user_info_frame.winfo_children():
         widget.grid_configure(padx=10, pady=5)
 
-    
+
     # disable placeholder
     name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
     name_entry.bind('<FocusOut>', lambda x: on_focus_out(name_entry, 'Enter name'))
@@ -208,7 +217,6 @@ def customer(window, system):
 
     id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
     id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, 'C#'))
-
 
     # ============== Treeview ============== #
     treeFrame = ttk.Frame(customer_frame)
@@ -248,7 +256,7 @@ def invoice(window, system):
         for customer in system.get_list("customer"):
             customer_id_list.append(customer.get_id())
             customer_chosen_vehicle_list.append(customer.get_chosen_vehicle)
-            
+
         unassigned_customer = []
         for element in customer_id_list:
             if element not in invoice_customer_id_list:
@@ -256,15 +264,13 @@ def invoice(window, system):
 
         for customer_id in unassigned_customer:
             customer_name, customer_phone_num, customer_chosen_vehicle = get_.customer_data(system, customer_id)
-            invoice_id = f"I{random.randint(0, 999)}"
-            while invoice_id in invoice_id_list:
-                invoice_id = f"I{random.randint(0, 999)}"
+            invoice_id = dc.create_invoice_id(system)
 
             for driver in system.get_list("driver"):
                 driver_vehicle_id = driver.get_vehicle_id()
                 driver_vehicle_type = driver_vehicle_id[:2]
                 if driver_vehicle_type == customer_chosen_vehicle:
-                    driver_id = driver.get_id()          
+                    driver_id = driver.get_id()
 
 
             # need a date randomizer
@@ -273,17 +279,17 @@ def invoice(window, system):
             distance = random.randint(0, 100)
             price_per_km = dc.create_price(customer_chosen_vehicle)
             total_fee = distance*int(price_per_km)
-    
+
             row_values = [invoice_id, customer_id, driver_id, date, payment, distance, price_per_km, total_fee]
             system.set_new_invoice(row_values)
-            
-            treeview.insert('', tk.END, value=row_values)            
+
+            treeview.insert('', tk.END, value=row_values)
 
     def load_data():
         head = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
         for head_name in head:
             treeview.heading(head_name, text=head_name)
-        
+
         for invoice in system.get_list("invoice"):
             treeview.insert('', tk.END, values=(invoice.get_id(), invoice.get_customer_id(), invoice.get_driver_id(), invoice.get_date(),
                                                 invoice.get_payment_mode(), invoice.get_distance(), invoice.get_price_per_km(), invoice.get_total()))
@@ -342,11 +348,10 @@ def vehicle(window, system):
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
         if not validation.is_valid_vehicle_type(type):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=vehicle_window)
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=vehicle_window)
         else:
-            
             vehicle_id = dc.create_vehicle_id(system, type)
             price = dc.create_price(type)
             assign = "false"
@@ -368,7 +373,7 @@ def vehicle(window, system):
 
         # Grab row to update
         selected = treeview.focus()
-        
+
         # Grab data
         values = treeview.item(selected, 'values')
 
@@ -380,9 +385,9 @@ def vehicle(window, system):
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
         if not validation.is_valid_vehicle_type(type):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type")
-        elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=vehicle_window)
+        elif not validation.is_valid_regis_num(regis_num) or regis_num == "29-A# ###.##":
+            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=vehicle_window)
         else:
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
@@ -397,6 +402,13 @@ def vehicle(window, system):
                 updated_data2 = [values[0], values[1], regis_num, values[3], values[0]]
                 system.update_vehicle(updated_data2)
                 treeview.item(selected, text="", values=(values[0], values[1], regis_num, values[3]))
+
+    def clear_vehicle_data():
+        type_combobox.configure(state='normal')
+        regis_num_entry.configure(state='normal')
+
+        type_combobox.delete(0, "end")
+        regis_num_entry.delete(0, "end")
 
     # ============== Main window and Frames  ============== #
     # Main window 
@@ -434,9 +446,9 @@ def vehicle(window, system):
 
     # price
     price_label = tk.Label(vehicle_info_frame, text="Price")
-    price_label.grid(row=0, column=3)
+    price_label.grid(row=0, column=2)
     price_info_label = tk.Label(vehicle_info_frame, text="5S - 10,000\n7S - 13,000\n9S - 15,000")
-    price_info_label.grid(row=1, column=3)
+    price_info_label.grid(row=1, column=2)
 
     # Id
     id_label = tk.Label(delete_vehicle_info_frame, text="Vehicle ID")
@@ -445,7 +457,7 @@ def vehicle(window, system):
     id_entry.insert(0, "#S###")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
-    
+
     # ============== Modification Buttons ============== #
     # Add button
     button = tk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data)
@@ -458,7 +470,10 @@ def vehicle(window, system):
     # Update button 
     update_button = tk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data)
     update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
-    
+
+    # Clear button
+    clear_button = tk.Button(vehicle_info_frame, text="Clear data", command=clear_vehicle_data)
+    clear_button.grid(row=3, column=2, sticky="news", padx=20, pady=10)
     # Delete button
     delete_button = tk.Button(delete_vehicle_info_frame, text = "Delete data", command=delete_vehicle_data)
     delete_button.grid(row=1, column=1,sticky="news", padx=20, pady=10)
@@ -470,11 +485,12 @@ def vehicle(window, system):
 
     # Disable placeholder
     regis_num_entry.bind('<Button-1>', lambda x: on_focus_in(regis_num_entry))
-    regis_num_entry.bind('<FocusOut>', lambda x: on_focus_out(regis_num_entry, 'Enter regis number'))
+    regis_num_entry.bind('<FocusOut>', lambda x: on_focus_out(regis_num_entry, '29-A# ###.##'))
 
     id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
     id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, '#S###'))
-        
+
+     # ============== Treeview ============== #
     treeFrame = ttk.Frame(vehicle_frame)
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
@@ -508,9 +524,14 @@ def driver(window, system):
 
     def delete_driver_data():
         id = id_entry.get()
+        if id not in get_.driver_id_list(system):
+            tkinter.messagebox.showerror("Error", "Driver ID not found", parent = driver_window)
+            return
         driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(system, id)
         system.delete_object("driver", id)
+        get_.vehicle_assignment(system, driver_vehicle_id, "unassign")
         for row in treeview.get_children():
+            print({'text': '', 'image': '', 'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age], 'open': 0, 'tags': ''})
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
 
@@ -523,18 +544,18 @@ def driver(window, system):
         gender = gender_combobox.get()
         age = age_spinbox.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent = driver_window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent = driver_window)
         elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
             # need to check whether the vehicle actually exist or available for assignment also bug
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent = driver_window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 1:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent = driver_window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 0:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist")
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent = driver_window)
         elif not validation.is_valid_gender(gender):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent = driver_window)
         else:
             # The id need to be created by the system to make sure it's unique
             driver_id = dc.create_driver_id(system)
@@ -555,7 +576,7 @@ def driver(window, system):
             salary_entry.delete(0, "end")
             gender_combobox.set(gender_combo_list[0])
             age_spinbox.delete(0, "end")
-    
+
     def select_driver_data():
         # Disable placeholder
         name_entry.configure(state='normal')
@@ -575,7 +596,7 @@ def driver(window, system):
 
         # Grab row to update
         selected = treeview.focus()
-        
+
         # Grab data
         values = treeview.item(selected, 'values')
 
@@ -596,19 +617,18 @@ def driver(window, system):
         gender = gender_combobox.get()
         age = age_spinbox.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent = driver_window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent = driver_window)
         elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
             # need to check whether the vehicle actually exist or available for assignment also bug
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID")
-        # Need new validation
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent = driver_window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 2:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned")
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent = driver_window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 0:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist")
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent = driver_window)
         elif not validation.is_valid_gender(gender):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender")
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent = driver_window)
         else:
             # To get the values[0] == id, not other values
             selected = treeview.focus()
@@ -625,6 +645,24 @@ def driver(window, system):
             gender_combobox.delete(0, "end")
             age_spinbox.delete(0, "end")
 
+    def clear_driver_data():
+        # Disable placeholder
+        name_entry.configure(state='normal')
+        phone_num_entry.configure(state='normal')
+        vehicle_id_entry.configure(state='normal')
+        salary_entry.configure(state='normal')
+        gender_combobox.configure(state='normal')
+        age_spinbox.configure(state='normal')
+
+        # Clear boxes
+        name_entry.delete(0, "end")
+        phone_num_entry.delete(0, "end")
+        vehicle_id_entry.delete(0, "end")
+        salary_entry.delete(0, "end")
+        gender_combobox.delete(0, "end")
+        age_spinbox.delete(0, "end")
+            
+
     # ============== Main window and Frames  ============== #
     # Main window
 
@@ -634,8 +672,8 @@ def driver(window, system):
     # Main frame
     driver_frame = ttk.Frame(driver_window)
     driver_frame.pack()
-    
- 
+
+
     # Frame for adding and modifying informations
     driver_info_frame = tk.LabelFrame(driver_frame, text="Driver info")
     driver_info_frame.grid(row=0, column=0, padx=20, pady=10)
@@ -695,7 +733,7 @@ def driver(window, system):
     id_entry.insert(0, "D#")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
-    
+
 
     # ============== Modification Buttons ============== #
     # Add button
@@ -708,12 +746,16 @@ def driver(window, system):
 
     # Update button 
     update_button = tk.Button(driver_info_frame, text="Update data", command=update_driver_data)
-    update_button.grid(row=5, column=1, sticky="news", padx=20, pady=10)    
-    
+    update_button.grid(row=5, column=1, sticky="news", padx=20, pady=10)
+
+    # Clear button
+    clear_button = tk.Button(driver_info_frame, text="Clear data", command=clear_driver_data)
+    clear_button.grid(row=5, column=2, sticky="news", padx=20, pady=10)
+
     # Delete button
     delete_button = tk.Button(delete_driver_info_frame, text = "Delete data", command=delete_driver_data)
     delete_button.grid(row=3, column=1,sticky="news", padx=20, pady=10)
-    
+
 
     # ============== Others ============== #
     # Disable placeholder
@@ -761,9 +803,12 @@ def driver(window, system):
 
 # Saving the data to excel when closing the GUI
 def on_closing(window, system):
-    if tkinter.messagebox.askokcancel("Quit", "Do you want to quit, all changes will be save to database"):
+    msg_box = tkinter.messagebox.askokcancel("Save", "Do you want to quit, all changes will be save to database")
+    if msg_box == 'yes':
         dw.write_data(system)
-        window.destroy()
+    else:
+        if tkinter.messagebox.askokcancel("Quit", "Do you want to quit"):
+            window.destroy()
 
 
 """The main window"""
@@ -775,10 +820,10 @@ def main(system):
 
     frame = tk.Frame(window)
     frame.pack()
-    
+
     # ============== Open Different Administration Windows  ============== #
     # limit number of window opened
-    
+
     # Driver
     driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(window, system))
     driver_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)

@@ -1,5 +1,10 @@
 import openpyxl
-from Model import Customer, Vehicle, Driver, Feedback, Invoice
+
+from Management import Management
+from Domains import Customer, Vehicle, Driver, Invoice
+import database_creator as dc
+import validation
+from UserLoginGUI import user_login
 
 data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only=True)
 
@@ -129,3 +134,16 @@ data = openpyxl.load_workbook("Taxi-information.xlsx", read_only=True, data_only
 
     # for widget in invoice_info_frame.winfo_children():
     #     widget.grid_configure(padx=10, pady=5)
+
+# for i in range(10):
+#     print(dc.create_date())
+
+# for i in range(10):
+    # print(dc.create_vehicle_id(Management(), "5S"))
+
+# for i in range(10):
+    # print(dc.create_customer_id(Management()))
+    # print(dc.create_invoice_id(Management()))
+    # print(dc.create_phone_num())
+
+print(user_login())

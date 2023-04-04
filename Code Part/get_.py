@@ -18,20 +18,30 @@ def vehicle_data(system, id):
     price_int = int(price)
     return type, regis_num, price_int
 
-def vehicle_assignment(system, id):
+def vehicle_assignment(system, id, task):
     for vehicle in system.get_list("vehicle"):
         if vehicle.get_id() == id:
-            vehicle.set_assigned()
-
+            if task == "assign":
+                vehicle.set_assigned("true")
+            elif task == "unassign":
+                vehicle.set_assigned("false")
 
 def driver_data(system, id):
+    driver_name = driver_phone_num = driver_vehicle_id = driver_gender = driver_age = ""
+    driver_phone_num_withoutO = driver_salary = 0
     for driver in system.get_list("driver"):
-            if driver.get_id() == id:
-                driver_name = driver.get_name()
-                driver_phone_num = driver.get_phone_num()
-                driver_vehicle_id = driver.get_vehicle_id()
-                driver_salary = driver.get_salary()
-                driver_gender = driver.get_gender()
-                driver_age = driver.get_age()
-    driver_phone_num_without0 = int(driver_phone_num[1:])
-    return driver_name, driver_phone_num_without0, driver_vehicle_id, driver_salary, driver_gender, driver_age
+        if driver.get_id() == id:
+            driver_name = driver.get_name()
+            driver_phone_num = driver.get_phone_num()
+            driver_vehicle_id = driver.get_vehicle_id()
+            driver_salary = int(driver.get_salary())
+            driver_gender = driver.get_gender()
+            driver_age = int(driver.get_age())
+            driver_phone_num_withoutO = int(driver_phone_num[1:])
+    return driver_name, driver_phone_num_withoutO, driver_vehicle_id, driver_salary, driver_gender, driver_age
+
+def driver_id_list(system):
+    id_list = []
+    for driver in system.get_list("driver"):
+        id_list.append(driver.get_id())
+    return id_list
