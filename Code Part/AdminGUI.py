@@ -55,6 +55,7 @@ def customer(window, system):
             treeview.insert('', tk.END, values=(customer.get_id(), customer.get_name(), customer.get_phone_num(), customer.get_chosen_vehicle()))
 
 
+
     def delete_customer_data():
         id = id_entry.get()
         customer_name, customer_phone_num, customer_chosen_vehicle = get_.customer_data(system, id)
@@ -63,6 +64,7 @@ def customer(window, system):
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, customer_name, customer_phone_num, customer_chosen_vehicle], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
         id_entry.delete(0, "end")
+
 
 
     def enter_customer_data():
@@ -90,6 +92,8 @@ def customer(window, system):
         name_entry.configure(state='normal')
         phone_num_entry.configure(state='normal')
 
+
+
         # Clear entry boxes
         name_entry.delete(0, "end")
         phone_num_entry.delete(0, "end")
@@ -98,8 +102,10 @@ def customer(window, system):
         # Grab row to update
         selected = treeview.focus()
 
+
         # Grab data
         values = treeview.item(selected, 'values')
+
 
         # Output to boxes
         name_entry.insert(0, values[1])
@@ -164,6 +170,7 @@ def customer(window, system):
     phone_num_entry.insert(0, "0### ### ###")
     phone_num_entry.configure(state='disabled')
     phone_num_entry.grid(row=1, column=1)
+
 
     #Chosen vehicle
     type_list = ["5S", "7S", "9S"]
@@ -257,6 +264,7 @@ def invoice(window, system):
             customer_id_list.append(customer.get_id())
             customer_chosen_vehicle_list.append(customer.get_chosen_vehicle)
 
+
         unassigned_customer = []
         for element in customer_id_list:
             if element not in invoice_customer_id_list:
@@ -279,7 +287,7 @@ def invoice(window, system):
             distance = random.randint(0, 100)
             price_per_km = dc.create_price(customer_chosen_vehicle)
             total_fee = distance*int(price_per_km)
-
+    
             row_values = [invoice_id, customer_id, driver_id, date, payment, distance, price_per_km, total_fee]
             system.set_new_invoice(row_values)
 
@@ -352,6 +360,7 @@ def vehicle(window, system):
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
             tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=vehicle_window)
         else:
+            
             vehicle_id = dc.create_vehicle_id(system, type)
             price = dc.create_price(type)
             assign = "false"
@@ -820,10 +829,10 @@ def main(system):
 
     frame = tk.Frame(window)
     frame.pack()
-
+    
     # ============== Open Different Administration Windows  ============== #
     # limit number of window opened
-
+    
     # Driver
     driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(window, system))
     driver_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
