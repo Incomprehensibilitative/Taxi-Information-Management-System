@@ -6,8 +6,9 @@ def customer_data(system, id):
             customer_name = customer.get_name()
             customer_phone_num = customer.get_phone_num()
             customer_chosen_vehicle = customer.get_chosen_vehicle()
+            customer_pick_up_spot = customer.get_pick_up_spot()
     customer_phone_num_without0 = int(customer_phone_num[1:])
-    return customer_name, customer_phone_num_without0, customer_chosen_vehicle
+    return customer_name, customer_phone_num_without0, customer_chosen_vehicle, customer_pick_up_spot
 
 def vehicle_data(system, id):
     for vehicle in system.get_list("vehicle"):

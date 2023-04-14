@@ -49,21 +49,21 @@ workbook = openpyxl.load_workbook(path, data_only=True)
 def customer(window, system):
     def load_data():
         # define heading for the treeview
-        head = ("id", "name", "phone_num", "chosen_vehicle")
+        head = ("id", "name", "phone_num", "chosen_vehicle", "pick_up_spot")
         for heading_name in head:
             treeview.heading(heading_name, text=heading_name)
         # append customer data from customer list into treeview
         for customer in system.get_list("customer"):
             treeview.insert('', tk.END, values=(
-                customer.get_id(), customer.get_name(), customer.get_phone_num(), customer.get_chosen_vehicle()))
+                customer.get_id(), customer.get_name(), customer.get_phone_num(), customer.get_chosen_vehicle(), customer.get_pick_up_spot()))
 
     def delete_customer_data():
         id = id_entry.get()
-        customer_name, customer_phone_num, customer_chosen_vehicle = get_.customer_data(system, id)
+        customer_name, customer_phone_num, customer_chosen_vehicle, customer_pick_up_spot = get_.customer_data(system, id)
         system.delete_object("customer", id)
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '',
-                                      'values': [id, customer_name, customer_phone_num, customer_chosen_vehicle],
+                                      'values': [id, customer_name, customer_phone_num, customer_chosen_vehicle, customer_pick_up_spot],
                                       'open': 0, 'tags': ''}:
                 treeview.delete(row)
         id_entry.delete(0, "end")
@@ -72,6 +72,7 @@ def customer(window, system):
         name = name_entry.get()
         phone_num = phone_num_entry.get()
         chosen_vehicle = chosen_vehicle_combobox.get()
+        pick_up_spot = pick_up_spot_entry.get()
         if not validation.is_valid_name(name) or name == "Enter name":
             tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=customer_window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
@@ -81,22 +82,25 @@ def customer(window, system):
         else:
 
             customer_id = dc.create_customer_id(system)
-            row_values = [customer_id, name, phone_num, chosen_vehicle]
+            row_values = [customer_id, name, phone_num, chosen_vehicle, pick_up_spot]
             system.set_new_customer(row_values)
 
             treeview.insert('', tk.END, value=row_values)
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
+            pick_up_spot_entry.delete(0, "end")
 
     def select_customer_data():
         # Disable placeholder
         name_entry.configure(state='normal')
         phone_num_entry.configure(state='normal')
+        chosen_vehicle_combobox.configure(state='normal')
 
         # Clear entry boxes
         name_entry.delete(0, "end")
         phone_num_entry.delete(0, "end")
         chosen_vehicle_combobox.delete(0, "end")
+        pick_up_spot_entry.delete(0, "end")
 
         # Grab row to update
         selected = treeview.focus()
@@ -108,11 +112,14 @@ def customer(window, system):
         name_entry.insert(0, values[1])
         phone_num_entry.insert(0, values[2])
         chosen_vehicle_combobox.insert(0, values[3])
+        pick_up_spot_entry.insert(0, values[4])
         # chosen_vehicle_combobox.configure(state='disabled')
 
     def update_customer_data():
         name = name_entry.get()
         phone_num = phone_num_entry.get()
+        chosen_vehicle = chosen_vehicle_combobox.get()
+        pick_up_spot = pick_up_spot_entry.get()
         if not validation.is_valid_name(name) or name == "Enter name":
             tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=customer_window,
                                            icon="warning")
@@ -122,18 +129,20 @@ def customer(window, system):
             # To get the id, not other values
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
-            print(values)
             # Since the values[0] == id, so we want to keep it, and change other data
-            updated_data = [values[0], name, phone_num, values[3]]
+            updated_data = [values[0], name, phone_num, chosen_vehicle, pick_up_spot]
             system.update_customer(updated_data)
-            treeview.item(selected, text="", values=(values[0], name, phone_num, values[3]))
+            treeview.item(selected, text="", values=(values[0], name, phone_num, chosen_vehicle, pick_up_spot))
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
+            chosen_vehicle_combobox.delete(0, "end")
+            pick_up_spot_entry.delete(0, "end")
 
     def clear_customer_data():
         name_entry.delete(0, "end")
         phone_num_entry.delete(0, "end")
         chosen_vehicle_combobox.delete(0, "end")
+        pick_up_spot_entry.delete(0, "end")
 
     # ============== Main window and Frames  ============== #
     # Main window
@@ -176,6 +185,12 @@ def customer(window, system):
     chosen_vehicle_combobox = ttk.Combobox(user_info_frame, values=type_list)
     chosen_vehicle_combobox.grid(row=1, column=2)
 
+    # Pick_up_spot
+    pick_up_spot_label = tk.Label(user_info_frame, text="Pick up spot")
+    pick_up_spot_label.grid(row=0, column=3)
+    pick_up_spot_entry = tk.Entry(user_info_frame)
+    pick_up_spot_entry.grid(row=1, column=3)
+
     # Id
     id_label = tk.Label(delete_user_info_frame, text="Customer ID")
     id_label.grid(row=0, column=0)
@@ -183,6 +198,7 @@ def customer(window, system):
     id_entry.insert(0, "C#")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
+    
 
     # ============== Modification Buttons ============== #
     # Add Button
@@ -224,12 +240,13 @@ def customer(window, system):
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
     treeScroll.pack(side="right", fill="both")
-    cols = ("id", "name", "phone_num", "chosen_vehicle")
+    cols = ("id", "name", "phone_num", "chosen_vehicle", "pick_up_spot")
     treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
     treeview.column("id", width=70)
     treeview.column("name", width=150)
     treeview.column("phone_num", width=150)
     treeview.column("chosen_vehicle", width=150)
+    treeview.column("pick_up_spot", width=250)
     treeview.pack()
     treeScroll.config(command=treeview.yview())
     load_data()
@@ -264,7 +281,7 @@ def invoice(window, system):
                 unassigned_customer.append(element)
 
         for customer_id in unassigned_customer:
-            customer_name, customer_phone_num, customer_chosen_vehicle = get_.customer_data(system, customer_id)
+            customer_name, customer_phone_num, customer_chosen_vehicle, customer_pick_up_spot = get_.customer_data(system, customer_id)
             invoice_id = dc.create_invoice_id(system)
 
             for driver in system.get_list("driver"):
@@ -541,15 +558,13 @@ def driver(window, system):
         driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(
             system, id)
         system.delete_object("driver", id)
-        get_.vehicle_assignment(system, driver_vehicle_id, "unassigned")
+        get_.vehicle_assignment(system, driver_vehicle_id, "unassign")
         for row in treeview.get_children():
-            print({'text': '', 'image': '',
-                   'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender,
-                              driver_age], 'open': 0, 'tags': ''})
             if treeview.item(row) == {'text': '', 'image': '',
                                       'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary,
                                                  driver_gender, driver_age], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
+                treeview_vehicle.insert('', tk.END, values=driver_vehicle_id)
 
     def enter_driver_data():
         name = name_entry.get()
@@ -817,11 +832,12 @@ def driver(window, system):
 # Saving the data to excel when closing the GUI
 def on_closing(window, system):
     msg_box = tkinter.messagebox.askokcancel("Save", "Do you want to quit, all changes will be save to database")
-    if msg_box == 'yes':
+    print(msg_box)
+    if msg_box == True:
+        print("Saving data to excel")
         dw.write_data(system)
-    else:
-        if tkinter.messagebox.askokcancel("Quit", "Do you want to quit"):
-            window.destroy()
+    if tkinter.messagebox.askokcancel("Quit", "Do you want to quit"):
+        window.destroy()
 
 
 """The main window"""
@@ -830,7 +846,7 @@ def on_closing(window, system):
 def main(system):
     # ============== Main window and Frames  ============== #
     window = tk.Tk()
-    window.tk.call("source", "azure.tcl")
+    window.tk.call("source", "Azure-ttk-theme/azure.tcl")
     window.tk.call("set_theme", "dark")
     style = ttk.Style()
     style.configure("Treeview", rowheight=30)
@@ -852,13 +868,13 @@ def main(system):
     vehicle_button = ttk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(window, system))
     vehicle_button.grid(row=2, column=1, sticky="ew", padx=20, pady=10)
 
-    # Invoice
-    invoice_button = ttk.Button(frame, text="Print Invoice", command=lambda: invoice(window, system))
-    invoice_button.grid(row=3, column=1, sticky="ew", padx=20, pady=10)
-
     # Customer
     customer_button = ttk.Button(frame, text="Customer Administration", command=lambda: customer(window, system))
-    customer_button.grid(row=4, column=1, sticky="ew", padx=20, pady=10)
+    customer_button.grid(row=3, column=1, sticky="ew", padx=20, pady=10)
+
+    # Invoice
+    invoice_button = ttk.Button(frame, text="Show Invoices", command=lambda: invoice(window, system))
+    invoice_button.grid(row=4, column=1, sticky="ew", padx=20, pady=10)
 
     # Add invisible row to the bottom
     frame.rowconfigure(5, weight=2)

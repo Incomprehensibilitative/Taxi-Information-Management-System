@@ -11,12 +11,17 @@ class Customer:
         self.__name = None
         self.__phone_num = None
         self.__chosen_vehicle = None
+        self.__pick_up_spot = None
 
-    def set_customer(self, id, name, phone_num, type):
+    def set_customer(self, id, name, phone_num, type, pick_up_spot):
         self.__id = id
         self.__name = name
         self.__phone_num = phone_num
         self.__chosen_vehicle = type
+        self.__pick_up_spot = pick_up_spot
+
+    def get_pick_up_spot(self):
+        return self.__pick_up_spot
 
     def get_chosen_vehicle(self):
         return self.__chosen_vehicle

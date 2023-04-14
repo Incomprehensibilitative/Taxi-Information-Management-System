@@ -12,7 +12,7 @@ def take_customer_info():
     customer_list = []
     for row in sheet.iter_rows(min_row=2):
         new_customer = Customer.Customer()
-        new_customer.set_customer(row[0].value, row[1].value, row[2].value, row[3].value)
+        new_customer.set_customer(row[0].value, row[1].value, row[2].value, row[3].value, row[4].value)
         customer_list.append(new_customer)
     return customer_list
 
