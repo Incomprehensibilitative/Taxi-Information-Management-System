@@ -590,7 +590,7 @@ def driver(window, system):
             # The id need to be created by the system to make sure it's unique
             driver_id = dc.create_driver_id(system)
             # appending the value into
-            get_.vehicle_assignment(system, vehicle_id)
+            get_.vehicle_assignment(system, vehicle_id, "assign")
             row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
             system.set_new_driver(row_values)
 
