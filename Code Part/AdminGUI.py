@@ -88,6 +88,7 @@ def customer(window, system):
             treeview.insert('', tk.END, value=row_values)
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
+            chosen_vehicle_combobox.delete(0, "end")
             pick_up_spot_entry.delete(0, "end")
 
     def select_customer_data():
@@ -422,10 +423,14 @@ def vehicle(window, system):
                 updated_data1 = [new_vehicle_id, type, regis_num, new_price, old_vehicle_id]
                 system.update_vehicle(updated_data1)
                 treeview.item(selected, text="", values=(new_vehicle_id, type, regis_num, new_price))
+                type_combobox.delete(0, "end")
+                regis_num_entry.delete(0, "end")
             else:
                 updated_data2 = [values[0], values[1], regis_num, values[3], values[0]]
                 system.update_vehicle(updated_data2)
                 treeview.item(selected, text="", values=(values[0], values[1], regis_num, values[3]))
+                type_combobox.delete(0, "end")
+                regis_num_entry.delete(0, "end")
 
     def clear_vehicle_data():
         type_combobox.configure(state='normal')
@@ -437,7 +442,7 @@ def vehicle(window, system):
     # ============== Main window and Frames  ============== #
     # Main window
     vehicle_window = tk.Toplevel(window)
-    vehicle_window.title("New vehicle")
+    vehicle_window.title("Vehicle Admin")
 
     # Main frame
     vehicle_frame = tk.Frame(vehicle_window)
@@ -593,7 +598,7 @@ def driver(window, system):
             get_.vehicle_assignment(system, vehicle_id, "assign")
             row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
             system.set_new_driver(row_values)
-
+            
             treeview.insert('', tk.END, values=row_values)
 
             for row in treeview_vehicle.get_children():
@@ -605,7 +610,7 @@ def driver(window, system):
             phone_num_entry.delete(0, "end")
             vehicle_id_entry.delete(0, "end")
             salary_entry.delete(0, "end")
-            gender_combobox.set(gender_combo_list[0])
+            gender_combobox.delete(0, "end")
             age_spinbox.delete(0, "end")
 
     def select_driver_data():
@@ -663,11 +668,21 @@ def driver(window, system):
             # To get the values[0] == id, not other values
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
-
-            updated_data = [values[0], name, phone_num, vehicle_id, salary, age, gender]
+            if vehicle_id != values[3]:
+                get_.vehicle_assignment(system, values[3], "unassign")
+                get_.vehicle_assignment(system, vehicle_id, "assign")
+            
+            updated_data = [values[0], name, phone_num, vehicle_id, salary, gender, age]
             system.update_driver(updated_data)
-
+            
             treeview.item(selected, text="", values=(values[0], name, phone_num, vehicle_id, salary, gender, age))
+
+            for row in treeview_vehicle.get_children():
+                if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
+                                                  'tags': ''}:
+                    treeview_vehicle.delete(row)
+                    treeview_vehicle.insert('', tk.END, values=[values[3]])
+                    
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
             vehicle_id_entry.delete(0, "end")
@@ -832,7 +847,6 @@ def driver(window, system):
 # Saving the data to excel when closing the GUI
 def on_closing(window, system):
     msg_box = tkinter.messagebox.askokcancel("Save", "Do you want to quit, all changes will be save to database")
-    print(msg_box)
     if msg_box == True:
         print("Saving data to excel")
         dw.write_data(system)
