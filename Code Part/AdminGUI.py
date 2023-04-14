@@ -14,6 +14,7 @@
 """
 import tkinter as tk
 import tkinter.messagebox
+from ttkthemes import ThemedStyle
 from tkinter import ttk
 import openpyxl
 import random
@@ -185,23 +186,23 @@ def customer(window, system):
 
     # ============== Modification Buttons ============== #
     # Add Button
-    add_button = tk.Button(user_info_frame, text="Enter data", command=enter_customer_data)
+    add_button = ttk.Button(user_info_frame, text="Enter data", command=enter_customer_data, style="Accent.TButton")
     add_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Select button
-    select_button = tk.Button(user_info_frame, text="Select data", command=select_customer_data)
+    select_button = ttk.Button(user_info_frame, text="Select data", command=select_customer_data, style="Accent.TButton")
     select_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
     # Update button
-    update_button = tk.Button(user_info_frame, text="Update data", command=update_customer_data)
+    update_button = ttk.Button(user_info_frame, text="Update data", command=update_customer_data, style="Accent.TButton")
     update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
 
     # Clear button
-    clear_button = tk.Button(user_info_frame, text="Clear data", command=clear_customer_data)
+    clear_button = ttk.Button(user_info_frame, text="Clear data", command=clear_customer_data, style="Accent.TButton")
     clear_button.grid(row=3, column=2, sticky="news", padx=20, pady=10)
 
     # Delete button
-    delete_button = tk.Button(delete_user_info_frame, text="Delete data", command=delete_customer_data)
+    delete_button = ttk.Button(delete_user_info_frame, text="Delete data", command=delete_customer_data, style="Accent.TButton")
     delete_button.grid(row=1, column=1, sticky="news", padx=20, pady=10)
 
     # Regridding widgets
@@ -305,7 +306,7 @@ def invoice(window, system):
     treeScroll = ttk.Scrollbar(treeFrame)
     treeScroll.pack(side="right", fill="both")
     cols = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
-    treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=20)
+    treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
     treeview.column("id", width=65)
     treeview.column("customer_id", width=110)
     treeview.column("driver_id", width=100)
@@ -466,22 +467,23 @@ def vehicle(window, system):
 
     # ============== Modification Buttons ============== #
     # Add button
-    button = tk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data)
+    button = ttk.Button(vehicle_info_frame, text="Enter data", command=enter_vehicle_data, style="Accent.TButton")
     button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Select button
-    select_button = tk.Button(vehicle_info_frame, text="Select data", command=select_vehicle_data)
+    select_button = ttk.Button(vehicle_info_frame, text="Select data", command=select_vehicle_data, style="Accent.TButton")
     select_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
     # Update button
-    update_button = tk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data)
+    update_button = ttk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data, style="Accent.TButton")
     update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
 
     # Clear button
-    clear_button = tk.Button(vehicle_info_frame, text="Clear data", command=clear_vehicle_data)
+    clear_button = ttk.Button(vehicle_info_frame, text="Clear data", command=clear_vehicle_data, style="Accent.TButton")
     clear_button.grid(row=3, column=2, sticky="news", padx=20, pady=10)
+
     # Delete button
-    delete_button = tk.Button(delete_vehicle_info_frame, text="Delete data", command=delete_vehicle_data)
+    delete_button = ttk.Button(delete_vehicle_info_frame, text="Delete data", command=delete_vehicle_data, style="Accent.TButton")
     delete_button.grid(row=1, column=1, sticky="news", padx=20, pady=10)
 
     # ============== Others ============== #
@@ -698,7 +700,6 @@ def driver(window, system):
     name_label = tk.Label(driver_info_frame, text="Name")
     name_label.grid(row=0, column=0)
     name_entry = tk.Entry(driver_info_frame)
-    name_entry.insert(0, "Enter name")
     name_entry.configure(state='disabled')
     name_entry.grid(row=1, column=0)
 
@@ -729,6 +730,7 @@ def driver(window, system):
     gender_label = tk.Label(driver_info_frame, text="Gender")
     gender_label.grid(row=2, column=1)
     gender_combobox = ttk.Combobox(driver_info_frame, values=gender_combo_list)
+
     gender_combobox.grid(row=3, column=1)
 
     # age
@@ -747,23 +749,23 @@ def driver(window, system):
 
     # ============== Modification Buttons ============== #
     # Add button
-    add_button = tk.Button(driver_info_frame, text="Enter data", command=enter_driver_data)
+    add_button = ttk.Button(driver_info_frame, text="Enter data", command=enter_driver_data, style="Accent.TButton")
     add_button.grid(row=4, column=0, sticky="news", padx=20, pady=10)
 
     # Select button
-    select_button = tk.Button(driver_info_frame, text="Select data", command=select_driver_data)
+    select_button = ttk.Button(driver_info_frame, text="Select data", command=select_driver_data, style="Accent.TButton")
     select_button.grid(row=5, column=0, sticky="news", padx=20, pady=10)
 
     # Update button
-    update_button = tk.Button(driver_info_frame, text="Update data", command=update_driver_data)
+    update_button = ttk.Button(driver_info_frame, text="Update data", command=update_driver_data, style="Accent.TButton")
     update_button.grid(row=5, column=1, sticky="news", padx=20, pady=10)
 
     # Clear button
-    clear_button = tk.Button(driver_info_frame, text="Clear data", command=clear_driver_data)
+    clear_button = ttk.Button(driver_info_frame, text="Clear data", command=clear_driver_data, style="Accent.TButton")
     clear_button.grid(row=5, column=2, sticky="news", padx=20, pady=10)
 
     # Delete button
-    delete_button = tk.Button(delete_driver_info_frame, text="Delete data", command=delete_driver_data)
+    delete_button = ttk.Button(delete_driver_info_frame, text="Delete data", command=delete_driver_data, style="Accent.TButton")
     delete_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
 
     # ============== Others ============== #
@@ -828,30 +830,45 @@ def on_closing(window, system):
 def main(system):
     # ============== Main window and Frames  ============== #
     window = tk.Tk()
+    window.tk.call("source", "azure.tcl")
+    window.tk.call("set_theme", "dark")
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=30)
     window.title("Administration")
     window.geometry("400x400")
 
-    frame = tk.Frame(window)
-    frame.pack()
+    frame = ttk.Frame(window)
+    frame.pack(expand=True, fill="both")
 
-    # ============== Open Different Administration Windows  ============== #
-    # limit number of window opened
+    # Add invisible row to the top
+    frame.rowconfigure(0, weight=1)
+    ttk.Label(frame).grid(row=0, column=0, columnspan=3)
 
     # Driver
-    driver_button = tk.Button(frame, text="Driver Administration", command=lambda: driver(window, system))
-    driver_button.grid(row=1, column=0, sticky="news", padx=20, pady=10)
+    driver_button = ttk.Button(frame, text="Driver Administration", command=lambda: driver(window, system))
+    driver_button.grid(row=1, column=1, sticky="ew", padx=20, pady=10)
 
     # Vehicle
-    vehicle_button = tk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(window, system))
-    vehicle_button.grid(row=0, column=0, sticky="news", padx=20, pady=10)
+    vehicle_button = ttk.Button(frame, text="Vehicle Administration", command=lambda: vehicle(window, system))
+    vehicle_button.grid(row=2, column=1, sticky="ew", padx=20, pady=10)
 
     # Invoice
-    invoice_button = tk.Button(frame, text="Print Invoice", command=lambda: invoice(window, system))
-    invoice_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
+    invoice_button = ttk.Button(frame, text="Print Invoice", command=lambda: invoice(window, system))
+    invoice_button.grid(row=3, column=1, sticky="ew", padx=20, pady=10)
 
     # Customer
-    customer_button = tk.Button(frame, text="Customer Administration", command=lambda: customer(window, system))
-    customer_button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
+    customer_button = ttk.Button(frame, text="Customer Administration", command=lambda: customer(window, system))
+    customer_button.grid(row=4, column=1, sticky="ew", padx=20, pady=10)
+
+    # Add invisible row to the bottom
+    frame.rowconfigure(5, weight=2)
+    ttk.Label(frame).grid(row=5, column=0, columnspan=3)
+
+    # Add invisible column to the left
+    frame.columnconfigure(0, weight=1)
+
+    # Add invisible column to the right
+    frame.columnconfigure(2, weight=1)
 
     # Check if window is being close
     window.protocol("WM_DELETE_WINDOW", lambda: on_closing(window, system))
