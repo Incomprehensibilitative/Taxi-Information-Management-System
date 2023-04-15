@@ -31,19 +31,23 @@ def vehicle(window, system):
 
     def delete_vehicle_data():
         id = id_entry.get()
-        type, regis_num, price = get_.vehicle_data(system, id)
+        try: 
+            type, regis_num, price = get_.vehicle_data(system, id)
+        except UnboundLocalError:
+            tkinter.messagebox.showwarning(title="Error", message="Doesn't exist", parent=vehicle_window)
+        else:
         # delete from system
-        system.delete_object("vehicle", id)
-        # delete from driver_vehicle_id
-        for driver in system.get_list("driver"):
-            if driver.get_vehicle_id() == id:
-                driver.set_vehicle_id("None")
-        
-        # delete from treeview
-        for row in treeview.get_children():
-            if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price], 'open': 0,
-                                      'tags': ''}:
-                treeview.delete(row)
+            system.delete_object("vehicle", id)
+            # delete from driver_vehicle_id
+            for driver in system.get_list("driver"):
+                if driver.get_vehicle_id() == id:
+                    driver.set_vehicle_id("None")
+            
+            # delete from treeview
+            for row in treeview.get_children():
+                if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price], 'open': 0,
+                                        'tags': ''}:
+                    treeview.delete(row)
 
     def enter_vehicle_data():
         type = type_combobox.get()
@@ -128,6 +132,15 @@ def vehicle(window, system):
 
         type_combobox.delete(0, "end")
         regis_num_entry.delete(0, "end")
+        
+    def search_vehicle_data():
+        items_on_treeview = treeview.get_children()
+        search_regis_num = search_ent_var.get()
+        for item in items_on_treeview:
+            if search_regis_num in (treeview.item(item)['values'][2]):
+                treeview.move(item, '', 0)
+                treeview.selection_set(item)
+                
 
     # ============== Main window and Frames  ============== #
     # Main window
@@ -145,6 +158,10 @@ def vehicle(window, system):
     # Frame for deleting the data
     delete_vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Delete Vehicle")
     delete_vehicle_info_frame.grid(row=1, column=0, pady=10)
+    
+    # Frame for searching the data
+    search_vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Search Vehicle by Regis Number")
+    search_vehicle_info_frame.grid(row=1, column=1, pady=10)
 
     # ============== Basic information ============== #
     # type
@@ -159,7 +176,7 @@ def vehicle(window, system):
     regis_num_label.grid(row=0, column=0)
     regis_num_entry = tk.Entry(vehicle_info_frame)
     # the dash might create error
-    regis_num_entry.insert(0, "29-C1 233.23")
+    regis_num_entry.insert(0, "29-A# ###.##")
     regis_num_entry.configure(state='disabled')
     regis_num_entry.grid(row=1, column=0)
 
@@ -176,6 +193,14 @@ def vehicle(window, system):
     id_entry.insert(0, "#S###")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
+    
+    # Search regis number
+    search_label = tk.Label(search_vehicle_info_frame, text="Search")
+    search_label.grid(row=0, column=0)
+    search_ent_var = tk.Variable()
+    search_entry = tk.Entry(search_vehicle_info_frame, textvariable=search_ent_var)
+    search_entry.grid(row=1, column=0)
+    search_ent_var.trace("w", lambda name, index, mode, sv=search_ent_var: search_vehicle_data())
 
     # ============== Modification Buttons ============== #
     # Add button
@@ -197,10 +222,13 @@ def vehicle(window, system):
     # Delete button
     delete_button = ttk.Button(delete_vehicle_info_frame, text="Delete data", command=delete_vehicle_data, style="Accent.TButton")
     delete_button.grid(row=1, column=1, sticky="news", padx=20, pady=10)
-
+    
     # ============== Others ============== #
     # Regridding widgets
     for widget in vehicle_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+
+    for widget in search_vehicle_info_frame.winfo_children():
         widget.grid_configure(padx=10, pady=5)
 
     # Disable placeholder

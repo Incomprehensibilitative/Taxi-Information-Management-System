@@ -29,7 +29,7 @@ def driver(window, system):
                 driver.get_salary(),
                 driver.get_gender(), driver.get_age()))
 
-        head_vehicle = "unassigned_vehicle_id"
+        head_vehicle = "unassign_vehicle_id"
         treeview_vehicle.heading(head_vehicle, text=head_vehicle)
         for vehicle in dc.create_unassign_vehicle_list(system):
             treeview_vehicle.insert('', tk.END, values=vehicle)
@@ -46,10 +46,10 @@ def driver(window, system):
         get_.vehicle_assignment(system, driver_vehicle_id, "unassign")
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '',
-                                    'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary,
+                                    'values': [id, driver_name, driver_phone_num, str(driver_vehicle_id), driver_salary,
                                                 driver_gender, driver_age], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
-                if driver_vehicle_id == "None":
+                if str(driver_vehicle_id) == 'None':
                     id_entry.delete(0, tk.END)
                     return
                 else:
@@ -199,6 +199,24 @@ def driver(window, system):
         salary_entry.delete(0, "end")
         gender_combobox.delete(0, "end")
         age_spinbox.delete(0, "end")
+        
+    def search_driver_data():
+        items_on_treeview = treeview.get_children()
+        search_phone_num = search_ent_phone_num.get()
+        for item in items_on_treeview:
+            if search_phone_num in str("0" + str(treeview.item(item)['values'][2])):
+                # Put the search result on the top of the treeview and highight it
+                    treeview.move(item, '', 0)
+                    treeview.selection_set(item)
+
+    def search_unassign_vehicle_data():
+        items_on_treeview = treeview_vehicle.get_children()
+        search_vehicle_id = search_ent_unassign_vehicle_id.get()
+        for item in items_on_treeview:
+            if search_vehicle_id in str(treeview_vehicle.item(item)['values'][0]):
+                # Put the search result on the top of the treeview and highight it
+                    treeview_vehicle.move(item, '', 0)
+                    treeview_vehicle.selection_set(item)
 
     # ============== Main window and Frames  ============== #
     # Main window
@@ -217,6 +235,14 @@ def driver(window, system):
     # Frame for deleting the data
     delete_driver_info_frame = tk.LabelFrame(driver_frame, text="Delete Driver")
     delete_driver_info_frame.grid(row=1, column=0, pady=10)
+
+    # Frame for searching the driver phone number 
+    search_driver_info_frame = tk.LabelFrame(driver_frame, text="Search Customer by Phone Number")
+    search_driver_info_frame.grid(row=1, column=1, pady=10)
+    
+    # Frame for searching unassign vehicle
+    search_unassign_vehicle_frame = tk.LabelFrame(driver_frame, text="Search Unassign Vehicle")
+    search_unassign_vehicle_frame.grid(row=1, column=2, pady=10)
 
     # ============== Basic information ============== #
     # name
@@ -269,6 +295,22 @@ def driver(window, system):
     id_entry.insert(0, "D#")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
+    
+    # Search phone number
+    search_phone_num_label = tk.Label(search_driver_info_frame, text="Search")
+    search_phone_num_label.grid(row=0, column=0)
+    search_ent_phone_num = tk.Variable()
+    search_phone_num_entry = tk.Entry(search_driver_info_frame, textvariable=search_ent_phone_num)
+    search_phone_num_entry.grid(row=1, column=0)
+    search_ent_phone_num.trace("w", lambda name, index, mode, sv=search_ent_phone_num: search_driver_data())
+
+    # Search unassigned vehicles
+    search_unassign_vehicle_id_label = tk.Label(search_unassign_vehicle_frame, text="Search")
+    search_unassign_vehicle_id_label.grid(row=0, column=0)
+    search_ent_unassign_vehicle_id = tk.Variable()
+    search_unassign_vehicle_id_entry = tk.Entry(search_unassign_vehicle_frame, textvariable=search_ent_unassign_vehicle_id)
+    search_unassign_vehicle_id_entry.grid(row=1, column=0)
+    search_ent_unassign_vehicle_id.trace("w", lambda name, index, mode, sv=search_ent_unassign_vehicle_id: search_unassign_vehicle_data())
 
     # ============== Modification Buttons ============== #
     # Add button
@@ -289,8 +331,19 @@ def driver(window, system):
 
     # Delete button
     delete_button = ttk.Button(delete_driver_info_frame, text="Delete data", command=delete_driver_data, style="Accent.TButton")
-    delete_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
+    delete_button.grid(row=1, column=1, sticky="news", padx=20, pady=10)
 
+    # Regridding widgets
+    for widget in driver_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+    
+    for widget in search_unassign_vehicle_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+        
+    for widget in search_driver_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+    
+    
     # ============== Others ============== #
     # Disable placeholder
     name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
@@ -326,10 +379,10 @@ def driver(window, system):
     treeFrame_vehicle.grid(row=0, column=2, pady=10)
     treeScroll_vehicle = ttk.Scrollbar(treeFrame_vehicle)
     treeScroll_vehicle.pack(side="right", fill="y")
-    cols_vehicle = "unassigned_vehicle_id"
+    cols_vehicle = "unassign_vehicle_id"
     treeview_vehicle = ttk.Treeview(treeFrame_vehicle, show="headings", yscrollcommand=treeScroll_vehicle.set,
                                     columns=cols_vehicle, height=13)
-    treeview_vehicle.column("unassigned_vehicle_id", width=155)
+    treeview_vehicle.column("unassign_vehicle_id", width=155)
     treeview_vehicle.pack()
     treeScroll_vehicle.config(command=treeview_vehicle.yview())
 
