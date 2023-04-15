@@ -59,43 +59,47 @@ def driver(window, system):
         name = name_entry.get()
         phone_num = phone_num_entry.get()
         vehicle_id = vehicle_id_entry.get()
+        
         salary = salary_entry.get()
         gender = gender_combobox.get()
         age = age_spinbox.get()
+        if vehicle_id == '#S###':
+            vehicle_id = "None"
         if not validation.is_valid_name(name) or name == "Enter name":
             tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
             tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=window)
-        elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
-            # need to check whether the vehicle actually exist or available for assignment also bug
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent=window)
+        elif not validation.is_valid_gender(gender):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=window)
+        elif not validation.is_valid_vehicle_id(vehicle_id):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent=window)        
         elif validation.exist_vehicle_id(system, vehicle_id) == 1:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 0:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=window)
-        elif not validation.is_valid_gender(gender):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=window)
+        elif not validation.is_valid_age(age):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Age", parent=window)
         else:
-            # The id need to be created by the system to make sure it's unique
             driver_id = dc.create_driver_id(system)
             # appending the value into
-            get_.vehicle_assignment(system, vehicle_id, "assign")
-            row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
-            system.set_new_driver(row_values)
-            
-            treeview.insert('', tk.END, values=row_values)
+            if vehicle_id != 'None':
+                get_.vehicle_assignment(system, vehicle_id, "assign")
+                if vehicle_id in dc.create_unassign_vehicle_list(system):
+                    for row in treeview_vehicle.get_children():
+                        if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
+                                                        'tags': ''}:
+                            treeview_vehicle.delete(row)
+            else:
+                row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
+                system.set_new_driver(row_values)
+                
+                treeview.insert('', tk.END, values=row_values)
 
-            for row in treeview_vehicle.get_children():
-                if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
-                                                  'tags': ''}:
-                    treeview_vehicle.delete(row)
-
-            name_entry.delete(0, "end")
-            phone_num_entry.delete(0, "end")
-            vehicle_id_entry.delete(0, "end")
-            salary_entry.delete(0, "end")
-            gender_combobox.delete(0, "end")
-            age_spinbox.delete(0, "end")
+                name_entry.delete(0, "end")
+                phone_num_entry.delete(0, "end")
+                vehicle_id_entry.delete(0, "end")
+                salary_entry.delete(0, "end")
+                gender_combobox.delete(0, "end")
 
     def select_driver_data():
         # Disable placeholder
@@ -148,6 +152,8 @@ def driver(window, system):
             tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=window)
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=window)
+        elif not validation.is_valid_age(age):
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Age", parent=window)
         else:
             # To get the values[0] == id, not other values
             selected = treeview.focus()
@@ -284,7 +290,7 @@ def driver(window, system):
     # age
     age_label = tk.Label(driver_info_frame, text="Age")
     age_label.grid(row=2, column=2)
-    age_spinbox = tk.Spinbox(driver_info_frame, from_=0, to=200)
+    age_spinbox = tk.Spinbox(driver_info_frame, from_=18, to=200)
     age_spinbox.grid(row=3, column=2)
 
     # Id

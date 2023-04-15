@@ -39,7 +39,16 @@ def main(system):
     style = ttk.Style()
     style.configure("Treeview", rowheight=30)
     window.title("Administration")
-    window.geometry("400x400")
+    # set the size of the window
+    window.minsize(1900, 700)
+    window.geometry("800x600")
+    
+    # Add a background image
+    bg = tk.PhotoImage(file="background.png")
+    bg_label = tk.Label(window, image=bg)
+    # Place the image so it covers the whole window
+    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+    
 
     frame = ttk.Frame(window)
     frame.grid(row=0, column=0, sticky="nsew")
