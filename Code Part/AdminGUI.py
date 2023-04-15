@@ -14,9 +14,7 @@
 """
 import tkinter as tk
 import tkinter.messagebox
-from ttkthemes import ThemedStyle
 from tkinter import ttk
-import openpyxl
 import random
 
 import database_creator as dc
@@ -36,11 +34,6 @@ def on_focus_out(entry, placeholder):
     if entry.get() == "":
         entry.insert(0, placeholder)
         entry.configure(state='disabled')
-
-
-# load data from database to print onto GUI
-path = "Taxi-information.xlsx"
-workbook = openpyxl.load_workbook(path, data_only=True)
 
 """ New administration windows """
 
@@ -286,10 +279,13 @@ def invoice(window, system):
             invoice_id = dc.create_invoice_id(system)
 
             for driver in system.get_list("driver"):
-                driver_vehicle_id = driver.get_vehicle_id()
-                driver_vehicle_type = driver_vehicle_id[:2]
-                if driver_vehicle_type == customer_chosen_vehicle:
-                    driver_id = driver.get_id()
+                if driver.get_vehicle_id() is None:
+                    continue
+                else:
+                    driver_vehicle_id = driver.get_vehicle_id()
+                    driver_vehicle_type = driver_vehicle_id[:2]
+                    if driver_vehicle_type == customer_chosen_vehicle:
+                        driver_id = driver.get_id()
 
             # need a date randomizer
             date = dc.create_date()
@@ -362,7 +358,14 @@ def vehicle(window, system):
     def delete_vehicle_data():
         id = id_entry.get()
         type, regis_num, price = get_.vehicle_data(system, id)
+        # delete from system
         system.delete_object("vehicle", id)
+        # delete from driver_vehicle_id
+        for driver in system.get_list("driver"):
+            if driver.get_vehicle_id() == id:
+                driver.set_vehicle_id("None")
+        
+        # delete from treeview
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price], 'open': 0,
                                       'tags': ''}:
@@ -416,13 +419,26 @@ def vehicle(window, system):
         else:
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
+            # doesn't allow user to change the vehicle type if the id is assigned to a driver
+            for driver in system.get_list("driver"):
+                if driver.get_vehicle_id() == values[0]:
+                    tkinter.messagebox.showwarning(title="Error", message="Vehicle ID is assigned to a driver, can't change it type",
+                                                   parent=vehicle_window)
+                    type_combobox.delete(0, "end")
+                    regis_num_entry.delete(0, "end")
+                    return
+            
             if type != values[1]:
+                # create new vehicle id and it price
                 new_vehicle_id = dc.create_vehicle_id(system, type)
                 new_price = dc.create_price(type)
-                old_vehicle_id = values[0]
+                old_vehicle_id = values[0]                
+                # update vehicle id
                 updated_data1 = [new_vehicle_id, type, regis_num, new_price, old_vehicle_id]
                 system.update_vehicle(updated_data1)
                 treeview.item(selected, text="", values=(new_vehicle_id, type, regis_num, new_price))
+                
+                # reset input boxes
                 type_combobox.delete(0, "end")
                 regis_num_entry.delete(0, "end")
             else:
@@ -559,6 +575,7 @@ def driver(window, system):
         id = id_entry.get()
         if id not in get_.driver_id_list(system):
             tkinter.messagebox.showerror("Error", "Driver ID not found", parent=driver_window)
+            id_entry.delete(0, tk.END)
             return
         driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(
             system, id)
@@ -566,10 +583,14 @@ def driver(window, system):
         get_.vehicle_assignment(system, driver_vehicle_id, "unassign")
         for row in treeview.get_children():
             if treeview.item(row) == {'text': '', 'image': '',
-                                      'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary,
-                                                 driver_gender, driver_age], 'open': 0, 'tags': ''}:
+                                    'values': [id, driver_name, driver_phone_num, driver_vehicle_id, driver_salary,
+                                                driver_gender, driver_age], 'open': 0, 'tags': ''}:
                 treeview.delete(row)
-                treeview_vehicle.insert('', tk.END, values=driver_vehicle_id)
+                if driver_vehicle_id == "None":
+                    id_entry.delete(0, tk.END)
+                    return
+                else:
+                    treeview_vehicle.insert('', tk.END, values=driver_vehicle_id)
 
     def enter_driver_data():
         name = name_entry.get()
@@ -681,7 +702,16 @@ def driver(window, system):
                 if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
                                                   'tags': ''}:
                     treeview_vehicle.delete(row)
-                    treeview_vehicle.insert('', tk.END, values=[values[3]])
+                    if values[3] == "None":
+                        name_entry.delete(0, "end")
+                        phone_num_entry.delete(0, "end")
+                        vehicle_id_entry.delete(0, "end")
+                        salary_entry.delete(0, "end")
+                        gender_combobox.delete(0, "end")
+                        age_spinbox.delete(0, "end")
+                        return
+                    else:
+                        treeview_vehicle.insert('', tk.END, values=[values[3]])
                     
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")
