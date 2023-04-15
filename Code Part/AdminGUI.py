@@ -42,16 +42,21 @@ def main(system):
     window.geometry("400x400")
 
     frame = ttk.Frame(window)
-    frame.pack(expand=True, fill="both")
+    frame.grid(row=0, column=0, sticky="nsew")
 
     # Add invisible row to the top
     frame.rowconfigure(0, weight=1)
     ttk.Label(frame).grid(row=0, column=0, columnspan=3)
 
+    # Add an outline to the frame
+    frame["borderwidth"] = 3
+    frame["relief"] = "sunken"
+
+    
     # Driver
     driver_button = ttk.Button(frame, text="Driver Administration", command=lambda: DriverGUI.driver(window, system))
     driver_button.grid(row=1, column=1, sticky="ew", padx=20, pady=10)
-
+    
     # Vehicle
     vehicle_button = ttk.Button(frame, text="Vehicle Administration", command=lambda: VehicleGUI.vehicle(window, system))
     vehicle_button.grid(row=2, column=1, sticky="ew", padx=20, pady=10)
@@ -75,7 +80,6 @@ def main(system):
     frame.columnconfigure(2, weight=1)
 
     # Check if window is being close
-    
     window.protocol("WM_DELETE_WINDOW", lambda: on_closing(window, system))
 
     window.mainloop()

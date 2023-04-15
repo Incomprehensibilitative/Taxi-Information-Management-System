@@ -34,7 +34,7 @@ def vehicle(window, system):
         try: 
             type, regis_num, price = get_.vehicle_data(system, id)
         except UnboundLocalError:
-            tkinter.messagebox.showwarning(title="Error", message="Doesn't exist", parent=vehicle_window)
+            tkinter.messagebox.showwarning(title="Error", message="Doesn't exist", parent=window)
         else:
         # delete from system
             system.delete_object("vehicle", id)
@@ -53,9 +53,9 @@ def vehicle(window, system):
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
         if not validation.is_valid_vehicle_type(type):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=vehicle_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=window)
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "Enter regis number":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=vehicle_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=window)
         else:
 
             vehicle_id = dc.create_vehicle_id(system, type)
@@ -91,9 +91,9 @@ def vehicle(window, system):
         type = type_combobox.get()
         regis_num = regis_num_entry.get()
         if not validation.is_valid_vehicle_type(type):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=vehicle_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=window)
         elif not validation.is_valid_regis_num(regis_num) or regis_num == "29-A# ###.##":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=vehicle_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid regis number", parent=window)
         else:
             selected = treeview.focus()
             values = treeview.item(selected, 'values')
@@ -101,7 +101,7 @@ def vehicle(window, system):
             for driver in system.get_list("driver"):
                 if driver.get_vehicle_id() == values[0]:
                     tkinter.messagebox.showwarning(title="Error", message="Vehicle ID is assigned to a driver, can't change it type",
-                                                   parent=vehicle_window)
+                                                   parent=window)
                     type_combobox.delete(0, "end")
                     regis_num_entry.delete(0, "end")
                     return
@@ -143,13 +143,13 @@ def vehicle(window, system):
                 
 
     # ============== Main window and Frames  ============== #
-    # Main window
-    vehicle_window = tk.Toplevel(window)
-    vehicle_window.title("Vehicle Admin")
-
     # Main frame
-    vehicle_frame = tk.Frame(vehicle_window)
-    vehicle_frame.pack()
+    # check if a frame already exists in the window grid in position 0,1 (row 0, column 1) and destroy it
+    if len(window.grid_slaves(row=0, column=1)) > 0:
+        window.grid_slaves(row=0, column=1)[0].destroy()
+        
+    vehicle_frame = tk.Frame(window)
+    vehicle_frame.grid(row=0, column=1, padx=20, pady=10)
 
     # Frame for adding and modifying information
     vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Vehicle info")
@@ -252,5 +252,3 @@ def vehicle(window, system):
     treeview.pack()
     treeScroll.config(command=treeview.yview())
     load_data()
-
-    vehicle_window.mainloop()

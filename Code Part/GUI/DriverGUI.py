@@ -37,7 +37,7 @@ def driver(window, system):
     def delete_driver_data():
         id = id_entry.get()
         if id not in get_.driver_id_list(system):
-            tkinter.messagebox.showerror("Error", "Driver ID not found", parent=driver_window)
+            tkinter.messagebox.showerror("Error", "Driver ID not found", parent=window)
             id_entry.delete(0, tk.END)
             return
         driver_name, driver_phone_num, driver_vehicle_id, driver_salary, driver_gender, driver_age = get_.driver_data(
@@ -63,18 +63,18 @@ def driver(window, system):
         gender = gender_combobox.get()
         age = age_spinbox.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=window)
         elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
             # need to check whether the vehicle actually exist or available for assignment also bug
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent=window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 1:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 0:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=window)
         elif not validation.is_valid_gender(gender):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=window)
         else:
             # The id need to be created by the system to make sure it's unique
             driver_id = dc.create_driver_id(system)
@@ -136,18 +136,18 @@ def driver(window, system):
         gender = gender_combobox.get()
         age = age_spinbox.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=window)
         elif not validation.is_valid_vehicle_id(vehicle_id) or vehicle_id == "#S###":
             # need to check whether the vehicle actually exist or available for assignment also bug
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Vehicle ID", parent=window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 2:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 0:
-            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=window)
         elif not validation.is_valid_gender(gender):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=driver_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=window)
         else:
             # To get the values[0] == id, not other values
             selected = treeview.focus()
@@ -219,14 +219,13 @@ def driver(window, system):
                     treeview_vehicle.selection_set(item)
 
     # ============== Main window and Frames  ============== #
-    # Main window
-
-    driver_window = tk.Toplevel(window)
-    driver_window.title("Driver Admin")
-
+    # check if a frame already exists in the window grid in position 0,1 (row 0, column 1) and destroy it
+    if len(window.grid_slaves(row=0, column=1)) > 0:
+        window.grid_slaves(row=0, column=1)[0].destroy()
+        
     # Main frame
-    driver_frame = ttk.Frame(driver_window)
-    driver_frame.pack()
+    driver_frame = ttk.Frame(window)
+    driver_frame.grid(row=0, column=1, padx=20, pady=10)
 
     # Frame for adding and modifying information
     driver_info_frame = tk.LabelFrame(driver_frame, text="Driver info")
@@ -387,5 +386,4 @@ def driver(window, system):
     treeScroll_vehicle.config(command=treeview_vehicle.yview())
 
     load_data()
-    driver_window.mainloop()
 

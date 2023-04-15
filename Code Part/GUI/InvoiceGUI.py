@@ -65,10 +65,13 @@ def invoice(window, system):
                 invoice.get_id(), invoice.get_customer_id(), invoice.get_driver_id(), invoice.get_date(),
                 invoice.get_payment_mode(), invoice.get_distance(), invoice.get_price_per_km(), invoice.get_total()))
 
-    invoice_window = tk.Toplevel(window)
-    invoice_window.title("New invoice")
-    invoice_frame = tk.Frame(invoice_window)
-    invoice_frame.pack()
+    # ============== Main window and Frames  ============== #
+    # check if a frame already exists in the window grid in position 0,1 (row 0, column 1) and destroy it
+    if len(window.grid_slaves(row=0, column=1)) > 0:
+        window.grid_slaves(row=0, column=1)[0].destroy()
+        
+    invoice_frame = tk.Frame(window)
+    invoice_frame.grid(row=0, column=1, sticky="nsew")
 
     # ============== Treeview  ============== #
     treeFrame = ttk.Frame(invoice_frame)
@@ -96,4 +99,3 @@ def invoice(window, system):
     invoice_frame.columnconfigure(1, weight=1)
     invoice_frame.columnconfigure(2, weight=1)
 
-    invoice_window.mainloop()

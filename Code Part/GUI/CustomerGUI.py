@@ -49,11 +49,11 @@ def customer(window, system):
         chosen_vehicle = chosen_vehicle_combobox.get()
         pick_up_spot = pick_up_spot_entry.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=customer_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=window)
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=customer_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=window)
         elif not validation.is_valid_vehicle_type(chosen_vehicle):
-            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=customer_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid vehicle type", parent=window)
         else:
 
             customer_id = dc.create_customer_id(system)
@@ -97,10 +97,10 @@ def customer(window, system):
         chosen_vehicle = chosen_vehicle_combobox.get()
         pick_up_spot = pick_up_spot_entry.get()
         if not validation.is_valid_name(name) or name == "Enter name":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=customer_window,
+            tkinter.messagebox.showwarning(title="Error", message="Invalid name", parent=window,
                                            icon="warning")
         elif not validation.is_valid_phone_number(phone_num) or phone_num == "0### ### ###":
-            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=customer_window)
+            tkinter.messagebox.showwarning(title="Error", message="Invalid Phone Number", parent=window)
         else:
             # To get the id, not other values
             selected = treeview.focus()
@@ -125,19 +125,20 @@ def customer(window, system):
         search_phone_num = search_ent_var.get()
         for item in items_on_treeview:
             if search_phone_num in str("0" + str(treeview.item(item)['values'][2])):
-                # Put the search result on the top of the treeview and highight it
+                # Put the search result on the top of the treeview and hightlight it
                     treeview.move(item, '', 0)
-                    treeview.selection_set(item)
+                    
                 
 
     # ============== Main window and Frames  ============== #
-    # Main window
-    customer_window = tk.Toplevel(window)
-    customer_window.title("Customer Admin")
+    # Main frame
+    # check if a frame already exists in the window grid in position 0,1 (row 0, column 1) and destroy it
+    if len(window.grid_slaves(row=0, column=1)) > 0:
+        window.grid_slaves(row=0, column=1)[0].destroy()
 
     # Main frame
-    customer_frame = ttk.Frame(customer_window)
-    customer_frame.pack()
+    customer_frame = ttk.Frame(window)
+    customer_frame.grid(row=0, column=1, padx=20, pady=10)
 
     # Frame for adding and modifying information
     user_info_frame = tk.LabelFrame(customer_frame, text="Customer Information")
@@ -222,9 +223,6 @@ def customer(window, system):
     # Regridding widgets
     for widget in user_info_frame.winfo_children():
         widget.grid_configure(padx=10, pady=5)
-        
-    for widget in search_user_info_frame.winfo_children():
-        widget.grid_configure(padx=10, pady=5)
 
     # disable placeholder
     name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
@@ -252,4 +250,3 @@ def customer(window, system):
     treeScroll.config(command=treeview.yview())
     load_data()
 
-    customer_window.mainloop()
