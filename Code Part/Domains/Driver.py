@@ -23,6 +23,9 @@ class Driver:
         self.__salary = salary
         self.__gender = gender
         self.__age = age
+        
+    def set_vehicle_id(self, vehicle_id):
+        self.__vehicle_id = vehicle_id
 
     def get_id(self):
         return self.__id

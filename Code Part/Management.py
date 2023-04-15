@@ -1,7 +1,7 @@
 """Use to manage all the changes into a list of objects
 After the software is terminated write all the changes to the database"""
 
-import database_reader as dr
+from Control import database_reader as dr
 from Domains import Customer, Vehicle, Driver, Invoice
 
 
