@@ -224,6 +224,9 @@ def customer(window, system):
     for widget in user_info_frame.winfo_children():
         widget.grid_configure(padx=10, pady=5)
 
+    for widget in search_user_info_frame.winfo_children():
+        widget.grid_configure(padx=10, pady=5)
+    
     # disable placeholder
     name_entry.bind('<Button-1>', lambda x: on_focus_in(name_entry))
     name_entry.bind('<FocusOut>', lambda x: on_focus_out(name_entry, 'Enter name'))
