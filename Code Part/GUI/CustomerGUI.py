@@ -121,13 +121,25 @@ def customer(window, system):
         pick_up_spot_entry.delete(0, "end")
         
     def search_customer_data():
-        items_on_treeview = treeview.get_children()
-        search_phone_num = search_ent_var.get()
-        for item in items_on_treeview:
-            if search_phone_num in str("0" + str(treeview.item(item)['values'][2])):
-                # Put the search result on the top of the treeview and hightlight it
-                    treeview.move(item, '', 0)
-                    
+        search_by = search_by_combobox.get()
+        if search_by == "":
+            tkinter.messagebox.showwarning(title="Error", message="Please select a search option", parent=window)
+            search_ent_var.set("")
+        else:
+            items_on_treeview = treeview.get_children()
+            search_phone_num = search_ent_var.get()
+            if search_by == "Phone Number":
+                for item in items_on_treeview:
+                    if search_phone_num in str("0" + str(treeview.item(item)['values'][2])):
+                        # Put the search result on the top of the treeview and hightlight it
+                            treeview.move(item, '', 0)
+                            treeview.selection_set(item)
+            if search_by == "Name":
+                for item in items_on_treeview:
+                    if search_phone_num in str(treeview.item(item)['values'][1]):
+                        # Put the search result on the top of the treeview and hightlight it
+                            treeview.move(item, '', 0)
+                            treeview.selection_set(item)
                 
 
     # ============== Main window and Frames  ============== #
@@ -190,12 +202,20 @@ def customer(window, system):
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
     
+    # Search by
+    search_by_combo_list = ["Phone Number", "Name"]
+    search_by_label = tk.Label(search_user_info_frame, text="Search by")
+    search_by_label.grid(row=0, column=0)
+    search_by_combobox = ttk.Combobox(search_user_info_frame, values=search_by_combo_list)
+    search_by_combobox.grid(row=1, column=0)
+    
+    
     # Search phone number
     search_label = tk.Label(search_user_info_frame, text="Search")
-    search_label.grid(row=0, column=0)
+    search_label.grid(row=0, column=1)
     search_ent_var = tk.Variable()
     search_entry = tk.Entry(search_user_info_frame, textvariable=search_ent_var)
-    search_entry.grid(row=1, column=0)
+    search_entry.grid(row=1, column=1)
     search_ent_var.trace("w", lambda name, index, mode, sv=search_ent_var: search_customer_data())
     
 

@@ -54,6 +54,7 @@ def driver(window, system):
                     return
                 else:
                     treeview_vehicle.insert('', tk.END, values=driver_vehicle_id)
+                    id_entry.delete(0, tk.END)
 
     def enter_driver_data():
         name = name_entry.get()
@@ -82,24 +83,24 @@ def driver(window, system):
         else:
             driver_id = dc.create_driver_id(system)
             # appending the value into
+            if vehicle_id in dc.create_unassign_vehicle_list(system):
+                for row in treeview_vehicle.get_children():
+                    if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
+                                                    'tags': ''}:
+                        treeview_vehicle.delete(row)
+                        break
             if vehicle_id != 'None':
                 get_.vehicle_assignment(system, vehicle_id, "assign")
-                if vehicle_id in dc.create_unassign_vehicle_list(system):
-                    for row in treeview_vehicle.get_children():
-                        if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
-                                                        'tags': ''}:
-                            treeview_vehicle.delete(row)
-            else:
-                row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
-                system.set_new_driver(row_values)
-                
-                treeview.insert('', tk.END, values=row_values)
+            row_values = [driver_id, name, phone_num, vehicle_id, salary, gender, age]
+            system.set_new_driver(row_values)
+            
+            treeview.insert('', tk.END, values=row_values)
 
-                name_entry.delete(0, "end")
-                phone_num_entry.delete(0, "end")
-                vehicle_id_entry.delete(0, "end")
-                salary_entry.delete(0, "end")
-                gender_combobox.delete(0, "end")
+            name_entry.delete(0, "end")
+            phone_num_entry.delete(0, "end")
+            vehicle_id_entry.delete(0, "end")
+            salary_entry.delete(0, "end")
+            gender_combobox.delete(0, "end")
 
     def select_driver_data():
         # Disable placeholder
@@ -207,14 +208,40 @@ def driver(window, system):
         age_spinbox.delete(0, "end")
         
     def search_driver_data():
-        items_on_treeview = treeview.get_children()
-        search_phone_num = search_ent_phone_num.get()
-        for item in items_on_treeview:
-            if search_phone_num in str("0" + str(treeview.item(item)['values'][2])):
-                # Put the search result on the top of the treeview and highight it
-                    treeview.move(item, '', 0)
-                    treeview.selection_set(item)
-
+        search_by = search_by_combobox.get()
+        if search_by == "":
+            tkinter.messagebox.showwarning(title="Error", message="Please select a search option", parent=window)    
+            # delete input in search entry
+            search_ent_var.set("")
+            return
+        else: 
+            items_on_treeview = treeview.get_children()
+            search_phone_num = search_ent_var.get()
+            if search_by == "Driver ID":
+                for item in items_on_treeview:
+                    if search_phone_num in str(treeview.item(item)['values'][0]):
+                        # Put the search result on the top of the treeview and highight it
+                            treeview.move(item, '', 0)
+                            treeview.selection_set(item)
+            if search_by == "Name":
+                for item in items_on_treeview:
+                    if search_phone_num in str(treeview.item(item)['values'][1]):
+                        # Put the search result on the top of the treeview and highight it
+                            treeview.move(item, '', 0)
+                            treeview.selection_set(item)
+            if search_by == "Vehicle ID":
+                for item in items_on_treeview:
+                    if search_phone_num in str(treeview.item(item)['values'][3]):
+                        # Put the search result on the top of the treeview and highight it
+                            treeview.move(item, '', 0)
+                            treeview.selection_set(item)
+            if search_by == "Phone Number":
+                for item in items_on_treeview:
+                    if search_phone_num in str("0" + str(treeview.item(item)['values'][2])):
+                        # Put the search result on the top of the treeview and highight it
+                            treeview.move(item, '', 0)
+                            treeview.selection_set(item)
+            
     def search_unassign_vehicle_data():
         items_on_treeview = treeview_vehicle.get_children()
         search_vehicle_id = search_ent_unassign_vehicle_id.get()
@@ -301,13 +328,20 @@ def driver(window, system):
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
     
-    # Search phone number
-    search_phone_num_label = tk.Label(search_driver_info_frame, text="Search")
-    search_phone_num_label.grid(row=0, column=0)
-    search_ent_phone_num = tk.Variable()
-    search_phone_num_entry = tk.Entry(search_driver_info_frame, textvariable=search_ent_phone_num)
-    search_phone_num_entry.grid(row=1, column=0)
-    search_ent_phone_num.trace("w", lambda name, index, mode, sv=search_ent_phone_num: search_driver_data())
+    # Search by
+    search_by_combo_list = ["Driver ID", "Name", "Phone Number", "Vehicle ID"]
+    search_by_label = tk.Label(search_driver_info_frame, text="Search by")
+    search_by_label.grid(row=0, column=0)
+    search_by_combobox = ttk.Combobox(search_driver_info_frame, values=search_by_combo_list)
+    search_by_combobox.grid(row=1, column=0)
+    
+    # Search box 
+    search_label = tk.Label(search_driver_info_frame, text="Search")
+    search_label.grid(row=0, column=1)
+    search_ent_var = tk.Variable()
+    search_entry = tk.Entry(search_driver_info_frame, textvariable=search_ent_var)
+    search_entry.grid(row=1, column=1)
+    search_ent_var.trace("w", lambda name, index, mode, sv=search_ent_var: search_driver_data())
 
     # Search unassigned vehicles
     search_unassign_vehicle_id_label = tk.Label(search_unassign_vehicle_frame, text="Search")

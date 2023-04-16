@@ -21,13 +21,21 @@ def on_focus_out(entry, placeholder):
 def vehicle(window, system):
     # ============== Main functions ============== #
     def load_data():
-        head = ("id", "type", "regis_num", "price")
+        head = ("id", "type", "regis_num", "price", "assigned", "driver_id")
         for heading_name in head:
             treeview.heading(heading_name, text=heading_name)
 
         for vehicle in system.get_list("vehicle"):
+            # Find the driver id of the vehicle
+            for driver in system.get_list("driver"):
+                if driver.get_vehicle_id() == vehicle.get_id():
+                    driver_id = driver.get_id()
+                    break
+                else:
+                    driver_id = "None"
             treeview.insert('', tk.END,
-                            values=(vehicle.get_id(), vehicle.get_type(), vehicle.get_regis_num(), vehicle.get_price()))
+                            values=(vehicle.get_id(), vehicle.get_type(), vehicle.get_regis_num(), vehicle.get_price(),
+                                    vehicle.get_assigned(), driver_id))
 
     def delete_vehicle_data():
         id = id_entry.get()
@@ -114,7 +122,7 @@ def vehicle(window, system):
                 # update vehicle id
                 updated_data1 = [new_vehicle_id, type, regis_num, new_price, old_vehicle_id]
                 system.update_vehicle(updated_data1)
-                treeview.item(selected, text="", values=(new_vehicle_id, type, regis_num, new_price))
+                treeview.item(selected, text="", values=(new_vehicle_id, type, regis_num, new_price, "false"))
                 
                 # reset input boxes
                 type_combobox.delete(0, "end")
@@ -122,7 +130,7 @@ def vehicle(window, system):
             else:
                 updated_data2 = [values[0], values[1], regis_num, values[3], values[0]]
                 system.update_vehicle(updated_data2)
-                treeview.item(selected, text="", values=(values[0], values[1], regis_num, values[3]))
+                treeview.item(selected, text="", values=(values[0], values[1], regis_num, values[3], "false"))
                 type_combobox.delete(0, "end")
                 regis_num_entry.delete(0, "end")
 
@@ -135,12 +143,36 @@ def vehicle(window, system):
         
     def search_vehicle_data():
         items_on_treeview = treeview.get_children()
-        search_regis_num = search_ent_var.get()
-        for item in items_on_treeview:
-            if search_regis_num in (treeview.item(item)['values'][2]):
-                treeview.move(item, '', 0)
-                treeview.selection_set(item)
-                
+        search_entry = search_ent_var.get()
+        search_by = search_by_combobox.get()
+        if search_by == "":
+            tkinter.messagebox.showwarning(title="Error", message="Please select a search option", parent=window)
+            search_ent_var.set("")
+        else:
+            items_on_treeview = treeview.get_children()
+            search_entry = search_ent_var.get()
+            if search_by == "Vehicle ID":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item)["values"][0]:
+                        treeview.move(item, '', 0)
+                        treeview.selection_set(item)
+            if search_by == "Vehicle Type":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item)["values"][1]:
+                        treeview.move(item, '', 0)
+                        treeview.selection_set(item)
+            if search_by == "Regis Number":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item)["values"][2]:
+                        treeview.move(item, '', 0)
+                        treeview.selection_set(item)
+            if search_by == "Driver ID":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item)["values"][5]:
+                        treeview.move(item, '', 0)
+                        treeview.selection_set(item)
+                        
+        
 
     # ============== Main window and Frames  ============== #
     # Main frame
@@ -194,12 +226,19 @@ def vehicle(window, system):
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
     
-    # Search regis number
+    # Search by
+    search_by_combo_list = ["Vehicle ID", "Type", "Regis Number", "Driver ID"]
+    search_by_label = tk.Label(search_vehicle_info_frame, text="Search by")
+    search_by_label.grid(row=0, column=0)
+    search_by_combobox = ttk.Combobox(search_vehicle_info_frame, values=search_by_combo_list)
+    search_by_combobox.grid(row=1, column=0)
+    
+    # Search
     search_label = tk.Label(search_vehicle_info_frame, text="Search")
-    search_label.grid(row=0, column=0)
+    search_label.grid(row=0, column=1)
     search_ent_var = tk.Variable()
     search_entry = tk.Entry(search_vehicle_info_frame, textvariable=search_ent_var)
-    search_entry.grid(row=1, column=0)
+    search_entry.grid(row=1, column=1)
     search_ent_var.trace("w", lambda name, index, mode, sv=search_ent_var: search_vehicle_data())
 
     # ============== Modification Buttons ============== #
@@ -238,17 +277,20 @@ def vehicle(window, system):
     id_entry.bind('<Button-1>', lambda x: on_focus_in(id_entry))
     id_entry.bind('<FocusOut>', lambda x: on_focus_out(id_entry, '#S###'))
 
-    # ============== Treeview ============== #
+    # ============== Treeview for Vehicle general data ============== #
     treeFrame = ttk.Frame(vehicle_frame)
     treeFrame.grid(row=0, column=1, pady=10)
     treeScroll = ttk.Scrollbar(treeFrame)
     treeScroll.pack(side="right", fill="y")
-    cols = ("id", "type", "regis_num", "price")
+    cols = ("id", "type", "regis_num", "price", "assigned", "driver_id")
     treeview = ttk.Treeview(treeFrame, show="headings", yscrollcommand=treeScroll.set, columns=cols, height=13)
     treeview.column("id", width=70)
     treeview.column("type", width=50)
     treeview.column("regis_num", width=120)
     treeview.column("price", width=80)
+    treeview.column("assigned", width=80)
+    treeview.column("driver_id", width=80)
     treeview.pack()
     treeScroll.config(command=treeview.yview())
+    
     load_data()

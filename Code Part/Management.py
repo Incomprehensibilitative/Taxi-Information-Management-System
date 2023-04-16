@@ -79,6 +79,6 @@ class Management:
             if vehicle.get_id() == values[4]:
                 self.delete_object("vehicle", values[4])
                 updated_vehicle = Vehicle.Vehicle()
-                updated_vehicle.set_vehicle(values[0], values[1], values[2], values[3])
+                updated_vehicle.set_vehicle(values[0], values[1], values[2], values[3], "false")
                 self.get_list("vehicle").insert(i, updated_vehicle)
                 break
