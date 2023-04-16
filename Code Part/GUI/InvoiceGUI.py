@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.messagebox
 from tkinter import ttk
 import random
 from Control import get_
@@ -65,6 +66,30 @@ def invoice(window, system):
                 invoice.get_id(), invoice.get_customer_id(), invoice.get_driver_id(), invoice.get_date(),
                 invoice.get_payment_mode(), invoice.get_distance(), invoice.get_price_per_km(), invoice.get_total()))
 
+    def search_invoice_data():
+        search_by = search_by_combobox.get()
+        if search_by == "":
+            tkinter.messagebox.showerror("Error", "Please select a search by option")
+            search_ent_var.set("")
+        else:
+            items_on_treeview = treeview.get_children()
+            search_entry = search_ent_var.get()
+            if search_by == "Invoice ID":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item, "values")[0]:
+                        treeview.move(item, "", 0)
+                        treeview.selection_set(item)
+            if search_by == "Customer ID":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item, "values")[1]:
+                        treeview.move(item, "", 0)
+                        treeview.selection_set(item)
+            if search_by == "Driver ID":
+                for item in items_on_treeview:
+                    if search_entry in treeview.item(item, "values")[2]:
+                        treeview.move(item, "", 0)
+                        treeview.selection_set(item)
+
     # ============== Main window and Frames  ============== #
     # check if a frame already exists in the window grid in position 0,1 (row 0, column 1) and destroy it
     if len(window.grid_slaves(row=0, column=1)) > 0:
@@ -72,10 +97,27 @@ def invoice(window, system):
         
     invoice_frame = tk.Frame(window)
     invoice_frame.grid(row=0, column=1, sticky="nsew")
-
+    
+    search_invoice_frame = tk.LabelFrame(invoice_frame, text="Search Invoice")
+    search_invoice_frame.grid(row=1, column=0, pady=10)
+    
+    # Search by
+    search_by_label = tk.Label(search_invoice_frame, text="Search by")
+    search_by_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+    search_by_combobox = ttk.Combobox(search_invoice_frame, values=["Invoice ID", "Customer ID", "Driver ID"])
+    search_by_combobox.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+                                      
+    # Search
+    search_label = tk.Label(search_invoice_frame, text="Search")
+    search_label.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+    search_ent_var = tk.Variable()
+    search_entry = tk.Entry(search_invoice_frame, textvariable=search_ent_var)
+    search_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+    search_ent_var.trace("w", lambda name, index, mode, sv=search_ent_var: search_invoice_data())
+    
     # ============== Treeview  ============== #
     treeFrame = ttk.Frame(invoice_frame)
-    treeFrame.grid(row=0, column=1, pady=10, sticky="nsew")
+    treeFrame.grid(row=0, column=0, pady=10, sticky="nsew")
     treeScroll = ttk.Scrollbar(treeFrame)
     treeScroll.pack(side="right", fill="both")
     cols = ("id", "customer_id", "driver_id", "date", "payment_mode", "distance", "price_per_km", "total_fee")
