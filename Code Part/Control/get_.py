@@ -16,8 +16,9 @@ def vehicle_data(system, id):
             type = vehicle.get_type()
             regis_num = vehicle.get_regis_num()
             price = vehicle.get_price()
+            assign = vehicle.get_assigned()
     price_int = int(price)
-    return type, regis_num, price_int
+    return type, regis_num, price_int, assign
 
 def vehicle_assignment(system, id, task):
     for vehicle in system.get_list("vehicle"):

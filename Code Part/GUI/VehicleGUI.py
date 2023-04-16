@@ -40,21 +40,22 @@ def vehicle(window, system):
     def delete_vehicle_data():
         id = id_entry.get()
         try: 
-            type, regis_num, price = get_.vehicle_data(system, id)
+            type, regis_num, price, assign = get_.vehicle_data(system, id)
         except UnboundLocalError:
             tkinter.messagebox.showwarning(title="Error", message="Doesn't exist", parent=window)
         else:
         # delete from system
+            driver_id = "None"
             system.delete_object("vehicle", id)
             # delete from driver_vehicle_id
             for driver in system.get_list("driver"):
                 if driver.get_vehicle_id() == id:
                     driver.set_vehicle_id("None")
+                    driver_id = driver.get_id()
             
             # delete from treeview
             for row in treeview.get_children():
-                if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price], 'open': 0,
-                                        'tags': ''}:
+                if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price, assign, driver_id], 'open': 0, 'tags': ''}:
                     treeview.delete(row)
 
     def enter_vehicle_data():
