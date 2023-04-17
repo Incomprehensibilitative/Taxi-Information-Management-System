@@ -165,23 +165,27 @@ def driver(window, system):
             
             updated_data = [values[0], name, phone_num, vehicle_id, salary, gender, age]
             system.update_driver(updated_data)
-            
             treeview.item(selected, text="", values=(values[0], name, phone_num, vehicle_id, salary, gender, age))
-
-            for row in treeview_vehicle.get_children():
-                if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
-                                                  'tags': ''}:
-                    treeview_vehicle.delete(row)
-                    if values[3] == "None":
-                        name_entry.delete(0, "end")
-                        phone_num_entry.delete(0, "end")
-                        vehicle_id_entry.delete(0, "end")
-                        salary_entry.delete(0, "end")
-                        gender_combobox.delete(0, "end")
-                        age_spinbox.delete(0, "end")
-                        return
-                    else:
+            
+            # if the treeview_vehicle is empty, and the value[3] is not None, then insert the value[3] into the treeview_vehicle
+            if values[3] != vehicle_id and vehicle_id != 'None' and values[3] != 'None':
+                for row in treeview_vehicle.get_children():
+                    print(treeview_vehicle.item(row))
+                    if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
+                                                    'tags': ''}:
+                        treeview_vehicle.delete(row)
                         treeview_vehicle.insert('', tk.END, values=[values[3]])
+            elif values[3] != vehicle_id and vehicle_id == 'None' and values[3] != 'None':
+                treeview_vehicle.insert('', tk.END, values=[values[3]])
+            elif values[3] != vehicle_id and vehicle_id != 'None' and values[3] == 'None':
+                for row in treeview_vehicle.get_children():
+                    print(treeview_vehicle.item(row))
+                    if treeview_vehicle.item(row) == {'text': '', 'image': '', 'values': [vehicle_id], 'open': 0,
+                                                    'tags': ''}:
+                        treeview_vehicle.delete(row)
+                  
+                # treeview_vehicle.insert('', tk.END, values=[vehicle_id])
+
                     
             name_entry.delete(0, "end")
             phone_num_entry.delete(0, "end")

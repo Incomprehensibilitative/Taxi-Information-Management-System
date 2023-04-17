@@ -96,7 +96,7 @@ def invoice(window, system):
         window.grid_slaves(row=0, column=1)[0].destroy()
         
     invoice_frame = tk.Frame(window)
-    invoice_frame.grid(row=0, column=1, sticky="nsew")
+    invoice_frame.grid(row=0, column=1,padx=20, sticky="nsew")
     
     search_invoice_frame = tk.LabelFrame(invoice_frame, text="Search Invoice")
     search_invoice_frame.grid(row=1, column=0, pady=10)
