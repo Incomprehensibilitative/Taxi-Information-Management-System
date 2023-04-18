@@ -1,5 +1,6 @@
 """Get the class object data given it unique id"""
 
+
 def customer_data(system, id):
     for customer in system.get_list("customer"):
         if customer.get_id() == id:
@@ -9,6 +10,7 @@ def customer_data(system, id):
             customer_pick_up_spot = customer.get_pick_up_spot()
     customer_phone_num_without0 = int(customer_phone_num[1:])
     return customer_name, customer_phone_num_without0, customer_chosen_vehicle, customer_pick_up_spot
+
 
 def vehicle_data(system, id):
     for vehicle in system.get_list("vehicle"):
@@ -20,16 +22,18 @@ def vehicle_data(system, id):
     price_int = int(price)
     return type, regis_num, price_int, assign
 
+
 def vehicle_assignment(system, id, task):
     for vehicle in system.get_list("vehicle"):
         if vehicle.get_id() == id:
             if task == "assign":
                 vehicle.set_assigned("true")
-            elif task == "unassign":
+            elif task == "unassigned":
                 vehicle.set_assigned("false")
 
+
 def driver_data(system, id):
-    driver_name = driver_phone_num = driver_vehicle_id = driver_gender = driver_age = ""
+    driver_name = driver_vehicle_id = driver_gender = driver_age = ""
     driver_phone_num_withoutO = driver_salary = 0
     for driver in system.get_list("driver"):
         if driver.get_id() == id:
@@ -41,6 +45,7 @@ def driver_data(system, id):
             driver_age = int(driver.get_age())
             driver_phone_num_withoutO = int(driver_phone_num[1:])
     return driver_name, driver_phone_num_withoutO, driver_vehicle_id, driver_salary, driver_gender, driver_age
+
 
 def driver_id_list(system):
     id_list = []

@@ -4,6 +4,7 @@ from tkinter import ttk
 from Control import validation, get_
 from Control import database_creator as dc
 
+
 # Placeholder Function: Allow sample input to be shown
 def on_focus_in(entry):
     if entry.cget('state') == 'disabled':
@@ -39,12 +40,12 @@ def vehicle(window, system):
 
     def delete_vehicle_data():
         id = id_entry.get()
-        try: 
+        try:
             type, regis_num, price, assign = get_.vehicle_data(system, id)
         except UnboundLocalError:
             tkinter.messagebox.showwarning(title="Error", message="Doesn't exist", parent=window)
         else:
-        # delete from system
+            # delete from system
             driver_id = "None"
             system.delete_object("vehicle", id)
             # delete from driver_vehicle_id
@@ -52,10 +53,12 @@ def vehicle(window, system):
                 if driver.get_vehicle_id() == id:
                     driver.set_vehicle_id("None")
                     driver_id = driver.get_id()
-            
+
             # delete from treeview
             for row in treeview.get_children():
-                if treeview.item(row) == {'text': '', 'image': '', 'values': [id, type, regis_num, price, assign, driver_id], 'open': 0, 'tags': ''}:
+                if treeview.item(row) == {'text': '', 'image': '',
+                                          'values': [id, type, regis_num, price, assign, driver_id], 'open': 0,
+                                          'tags': ''}:
                     treeview.delete(row)
 
     def enter_vehicle_data():
@@ -109,22 +112,23 @@ def vehicle(window, system):
             # doesn't allow user to change the vehicle type if the id is assigned to a driver
             for driver in system.get_list("driver"):
                 if driver.get_vehicle_id() == values[0]:
-                    tkinter.messagebox.showwarning(title="Error", message="Vehicle ID is assigned to a driver, can't change it type",
+                    tkinter.messagebox.showwarning(title="Error",
+                                                   message="Vehicle ID is assigned to a driver, can't change it type",
                                                    parent=window)
                     type_combobox.delete(0, "end")
                     regis_num_entry.delete(0, "end")
                     return
-            
+
             if type != values[1]:
-                # create new vehicle id and it price
+                # create new vehicle id and it prices
                 new_vehicle_id = dc.create_vehicle_id(system, type)
                 new_price = dc.create_price(type)
-                old_vehicle_id = values[0]                
+                old_vehicle_id = values[0]
                 # update vehicle id
                 updated_data1 = [new_vehicle_id, type, regis_num, new_price, old_vehicle_id]
                 system.update_vehicle(updated_data1)
                 treeview.item(selected, text="", values=(new_vehicle_id, type, regis_num, new_price, "false"))
-                
+
                 # reset input boxes
                 type_combobox.delete(0, "end")
                 regis_num_entry.delete(0, "end")
@@ -141,10 +145,8 @@ def vehicle(window, system):
 
         type_combobox.delete(0, "end")
         regis_num_entry.delete(0, "end")
-        
+
     def search_vehicle_data():
-        items_on_treeview = treeview.get_children()
-        search_entry = search_ent_var.get()
         search_by = search_by_combobox.get()
         if search_by == "":
             tkinter.messagebox.showwarning(title="Error", message="Please select a search option", parent=window)
@@ -172,15 +174,13 @@ def vehicle(window, system):
                     if search_entry in treeview.item(item)["values"][5]:
                         treeview.move(item, '', 0)
                         treeview.selection_set(item)
-                        
-        
 
     # ============== Main window and Frames  ============== #
     # Main frame
     # check if a frame already exists in the window grid in position 0,1 (row 0, column 1) and destroy it
     if len(window.grid_slaves(row=0, column=1)) > 0:
         window.grid_slaves(row=0, column=1)[0].destroy()
-        
+
     vehicle_frame = tk.Frame(window)
     vehicle_frame.grid(row=0, column=1, padx=20, pady=10)
 
@@ -191,7 +191,7 @@ def vehicle(window, system):
     # Frame for deleting the data
     delete_vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Delete Vehicle")
     delete_vehicle_info_frame.grid(row=1, column=0, pady=10)
-    
+
     # Frame for searching the data
     search_vehicle_info_frame = tk.LabelFrame(vehicle_frame, text="Search Vehicle by Regis Number")
     search_vehicle_info_frame.grid(row=1, column=1, pady=10)
@@ -226,14 +226,14 @@ def vehicle(window, system):
     id_entry.insert(0, "#S###")
     id_entry.configure(state='disabled')
     id_entry.grid(row=1, column=0)
-    
+
     # Search by
     search_by_combo_list = ["Vehicle ID", "Type", "Regis Number", "Driver ID"]
     search_by_label = tk.Label(search_vehicle_info_frame, text="Search by")
     search_by_label.grid(row=0, column=0)
     search_by_combobox = ttk.Combobox(search_vehicle_info_frame, values=search_by_combo_list)
     search_by_combobox.grid(row=1, column=0)
-    
+
     # Search
     search_label = tk.Label(search_vehicle_info_frame, text="Search")
     search_label.grid(row=0, column=1)
@@ -248,11 +248,13 @@ def vehicle(window, system):
     button.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
     # Select button
-    select_button = ttk.Button(vehicle_info_frame, text="Select data", command=select_vehicle_data, style="Accent.TButton")
+    select_button = ttk.Button(vehicle_info_frame, text="Select data", command=select_vehicle_data,
+                               style="Accent.TButton")
     select_button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
     # Update button
-    update_button = ttk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data, style="Accent.TButton")
+    update_button = ttk.Button(vehicle_info_frame, text="Update data", command=update_vehicle_data,
+                               style="Accent.TButton")
     update_button.grid(row=3, column=1, sticky="news", padx=20, pady=10)
 
     # Clear button
@@ -260,9 +262,10 @@ def vehicle(window, system):
     clear_button.grid(row=3, column=2, sticky="news", padx=20, pady=10)
 
     # Delete button
-    delete_button = ttk.Button(delete_vehicle_info_frame, text="Delete data", command=delete_vehicle_data, style="Accent.TButton")
+    delete_button = ttk.Button(delete_vehicle_info_frame, text="Delete data", command=delete_vehicle_data,
+                               style="Accent.TButton")
     delete_button.grid(row=1, column=1, sticky="news", padx=20, pady=10)
-    
+
     # ============== Others ============== #
     # Regridding widgets
     for widget in vehicle_info_frame.winfo_children():
@@ -293,5 +296,5 @@ def vehicle(window, system):
     treeview.column("driver_id", width=80)
     treeview.pack()
     treeScroll.config(command=treeview.yview())
-    
+
     load_data()

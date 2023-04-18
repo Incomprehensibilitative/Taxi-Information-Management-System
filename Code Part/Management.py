@@ -30,24 +30,20 @@ class Management:
         new_customer.set_customer(values[0], values[1], values[2], values[3], values[4])
         self.__customer_list.append(new_customer)
 
-
     def set_new_driver(self, values):
         new_driver = Driver.Driver()
         new_driver.set_driver(values[0], values[1], values[2], values[3], values[4], values[5], values[6])
         self.__driver_list.append(new_driver)
 
-
     def set_new_vehicle(self, values):
         new_vehicle = Vehicle.Vehicle()
-        new_vehicle.set_vehicle(values[0],values[1],values[2],values[3], values[4])
+        new_vehicle.set_vehicle(values[0], values[1], values[2], values[3], values[4])
         self.__vehicle_list.append(new_vehicle)
-
 
     def set_new_invoice(self, values):
         new_invoice = Invoice.Invoice()
         new_invoice.set_invoice(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7])
         self.__invoice_list.append(new_invoice)
-
 
     def delete_object(self, list_name, obj_id):
         obj_list = self.get_list(list_name)
