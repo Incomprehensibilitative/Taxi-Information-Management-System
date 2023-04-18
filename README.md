@@ -14,12 +14,18 @@
 ## Tasks
 - **Main**
   - [x] Default Repository for fork 
-  - [ ] UML of classes and functions 
-  - [ ] Implementation of classes with OOP and modularization 
-  - [ ] GUI: Tkinter 
-- **Side Quests**
-  - [ ] Persistence: Pickle and compression 
-  - [ ] Multithreading: To use Pickle in background thread 
+  - [x] UML of classes and functions 
+  - [x] Implementation of classes with OOP and modularization 
+  - [x] GUI: Tkinter 
+  - [x] Persistence: Update and Save changes to Database 
 --- 
 ## Deadlines
-  - https://docs.google.com/spreadsheets/d/1PMETv62in1MQP_y9kqRxM00pIvQhL2d2ZRyyKTmvGv8/edit#gid=0
+  - Create Templates: 23/03/2023
+  - Implement Codes: 23/03/2023 -> 01/04/2023
+  - Testing and Fixing Bugs 1: 01/04/2023 -> 04/04/2023 
+  - Presentation Deadline: 06/04/2023 -> Got cancelled
+  - Making better looking GUI: 07/04/2023 -> 10/04/2023
+  - Tesing and Fixing Bugs 2: 11/04/2023 -> 14/04/2023
+  - Adding Search Feature and Testing/Fixing Bugs 3: 15/04/2023 -> 17/04/2023
+  - Clean up project to turn in: 18/04/2023
+  
