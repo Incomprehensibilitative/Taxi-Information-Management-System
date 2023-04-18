@@ -1,4 +1,4 @@
-import AdminLoginGUI
+from GUI import AdminLoginGUI
 import Management
 
 if __name__ == "__main__":
