@@ -15,7 +15,8 @@ def create_date():
     date = str(random_date)
     return date
 
-def create_unassign_vehicle_list(system):
+
+def create_unassigned_vehicle_list(system):
     vehicle_id_list = []
     for vehicle in system.get_list("vehicle"):
         if vehicle.get_assigned() == "false":

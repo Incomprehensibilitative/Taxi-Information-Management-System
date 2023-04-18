@@ -32,14 +32,11 @@ def is_valid_vehicle_type(vehicle_type):
     pattern = r"^[579]S$"
     return bool(re.match(pattern, vehicle_type))
 
-def is_valid_age(age):
-    # must be a number and greater than 18
-    pattern = r"^([1-9]\d|[8-9]\d{2,})$"
-    return bool(re.match(pattern, age))
 
 def is_valid_age(age):
     # must be a number and greater than 18
-    pattern = r"^([1-9]\d|[8-9]\d{2,})$"
+    pattern = r"^(1[89]|[2-9]\d+|\d{2,})$"
+
     return bool(re.match(pattern, age))
 
 

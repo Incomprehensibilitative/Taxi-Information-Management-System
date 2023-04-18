@@ -18,10 +18,11 @@ from tkinter import ttk
 from Control import database_writer as dw
 from GUI import DriverGUI, VehicleGUI, InvoiceGUI, CustomerGUI
 
+
 # Saving the data to excel when closing the GUI
 def on_closing(window, system):
     msg_box = tkinter.messagebox.askokcancel("Save", "Do you want to quit, all changes will be save to database")
-    if msg_box == True:
+    if msg_box:
         print("Saving data to excel")
         dw.write_data(system)
     if tkinter.messagebox.askokcancel("Quit", "Do you want to quit"):
@@ -42,13 +43,12 @@ def main(system):
     # set the size of the window
     window.minsize(1900, 700)
     window.geometry("800x600")
-    
+
     # Add a background image
     bg = tk.PhotoImage(file="background.png")
     bg_label = tk.Label(window, image=bg)
     # Place the image so it covers the whole window
     bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-    
 
     frame = ttk.Frame(window)
     frame.grid(row=0, column=0, sticky="nsew")
@@ -61,17 +61,18 @@ def main(system):
     frame["borderwidth"] = 3
     frame["relief"] = "sunken"
 
-    
     # Driver
     driver_button = ttk.Button(frame, text="Driver Administration", command=lambda: DriverGUI.driver(window, system))
     driver_button.grid(row=1, column=1, sticky="ew", padx=20, pady=10)
-    
+
     # Vehicle
-    vehicle_button = ttk.Button(frame, text="Vehicle Administration", command=lambda: VehicleGUI.vehicle(window, system))
+    vehicle_button = ttk.Button(frame, text="Vehicle Administration",
+                                command=lambda: VehicleGUI.vehicle(window, system))
     vehicle_button.grid(row=2, column=1, sticky="ew", padx=20, pady=10)
 
     # Customer
-    customer_button = ttk.Button(frame, text="Customer Administration", command=lambda: CustomerGUI.customer(window, system))
+    customer_button = ttk.Button(frame, text="Customer Administration",
+                                 command=lambda: CustomerGUI.customer(window, system))
     customer_button.grid(row=3, column=1, sticky="ew", padx=20, pady=10)
 
     # Invoice
