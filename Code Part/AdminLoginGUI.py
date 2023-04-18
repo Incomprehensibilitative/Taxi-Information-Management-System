@@ -10,7 +10,7 @@ def user_login(system):
     # creating main window
     app = QApplication([])
     window = QMainWindow()
-    window.setWindowTitle("User Login")
+    window.setWindowTitle("Admin Login")
 
     # setting font
     font = QFont()

@@ -1,6 +1,6 @@
-import UserLoginGUI
+import AdminLoginGUI
 import Management
 
 if __name__ == "__main__":
     system = Management.Management()
-    UserLoginGUI.user_login(system)
+    AdminLoginGUI.user_login(system)

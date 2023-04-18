@@ -153,6 +153,8 @@ def driver(window, system):
             tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=window)
         elif validation.exist_vehicle_id(system, vehicle_id) == 0:
             tkinter.messagebox.showwarning(title="Error", message="Vehicle doesn't exist", parent=window)
+        elif validation.exist_vehicle_id(system, vehicle_id) == 1:
+            tkinter.messagebox.showwarning(title="Error", message="Vehicle already assigned", parent=window)
         elif not validation.is_valid_gender(gender):
             tkinter.messagebox.showwarning(title="Error", message="Invalid Gender", parent=window)
         elif not validation.is_valid_age(age):
