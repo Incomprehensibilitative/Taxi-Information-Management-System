@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QLineEdi
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
-import AdminGUI
+from GUI import AdminGUI
 
 
 def user_login(system):
